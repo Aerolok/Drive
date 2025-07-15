@@ -1,0 +1,129 @@
+{% extends 'layout.html' %}
+{% load static %}
+{% block content %}
+
+<div class="separador">
+  <h2>NOTICIAS DE NUESTRA INSTITUCIÓN</h2>
+  <div class="linea-turquesa"></div>
+</div>
+
+<section class="slider-contenedor">
+  <div class="slider" id="slider">
+    <div class="slide">
+      <img src="{% static 'img/xd.png' %}" alt="">
+    </div>
+    <div class="slide">
+      <img src="{% static 'img/xd.png' %}" alt="">
+    </div>
+    <div class="slide">
+      <img src="{% static 'img/xd.png' %}" alt="">
+    </div>
+    <div class="slide">
+      <img src="{% static 'img/xd.png' %}" alt="">
+    </div>
+  </div>
+</section>
+
+<div class="separador">
+  <h2>OPCIONES ISTLOJA</h2>
+  <div class="linea-turquesa"></div>
+</div>
+
+<section class="galeria-ofertas">
+  {% comment %} Repite esta estructura para cada opción {% endcomment %}
+  <div class="contenedor-imagen">
+    <img src="https://images.pexels.com/photos/4145197/pexels-photo-4145197.jpeg?auto=compress&cs=tinysrgb&w=800"
+      alt="">
+    <div class="cuadro-oferta">OFERTA ACADÉMICA</div>
+  </div>
+  <div class="contenedor-imagen">
+    <img src="https://images.pexels.com/photos/4145197/pexels-photo-4145197.jpeg?auto=compress&cs=tinysrgb&w=800"
+      alt="">
+    <div class="cuadro-oferta">ADMISIÓN</div>
+  </div>
+  <div class="contenedor-imagen">
+    <img src="https://images.pexels.com/photos/4145197/pexels-photo-4145197.jpeg?auto=compress&cs=tinysrgb&w=800"
+      alt="">
+    <div class="cuadro-oferta">ALUMNI IST LOJA</div>
+  </div>
+  <div class="contenedor-imagen">
+    <img src="https://images.pexels.com/photos/4145197/pexels-photo-4145197.jpeg?auto=compress&cs=tinysrgb&w=800"
+      alt="">
+    <div class="cuadro-oferta">SIGA</div>
+  </div>
+  <div class="contenedor-imagen">
+    <img src="https://images.pexels.com/photos/4145197/pexels-photo-4145197.jpeg?auto=compress&cs=tinysrgb&w=800"
+      alt="">
+    <div class="cuadro-oferta">AULA VIRTUAL (EVA)</div>
+  </div>
+  <div class="contenedor-imagen">
+    <img src="https://images.pexels.com/photos/4145197/pexels-photo-4145197.jpeg?auto=compress&cs=tinysrgb&w=800"
+      alt="">
+    <div class="cuadro-oferta">FORMACIÓN CONTINUA (EVA)</div>
+  </div>
+  <div class="contenedor-imagen">
+    <img src="https://images.pexels.com/photos/4145197/pexels-photo-4145197.jpeg?auto=compress&cs=tinysrgb&w=800"
+      alt="">
+    <div class="cuadro-oferta">VINCULACIÓN</div>
+  </div>
+  <div class="contenedor-imagen">
+    <img src="https://images.pexels.com/photos/4145197/pexels-photo-4145197.jpeg?auto=compress&cs=tinysrgb&w=800"
+      alt="">
+    <div class="cuadro-oferta">BIENESTAR ESTUDIANTIL</div>
+  </div>
+  <div class="contenedor-imagen">
+    <img src="https://images.pexels.com/photos/4145197/pexels-photo-4145197.jpeg?auto=compress&cs=tinysrgb&w=800"
+      alt="">
+    <div class="cuadro-oferta">BIBLIOTECA</div>
+  </div>
+</section>
+
+<div class="separador">
+  <h2>REDES SOCIALES ISTLOJA</h2>
+  <div class="linea-turquesa"></div>
+</div>
+
+<div class="bloque-redes">
+  <div class="redes-sociales">
+
+    <!-- Facebook -->
+    <div class="facebook">
+      <div class="fb-page" data-href="https://www.facebook.com/TecnologicoLoja" data-tabs="timeline" data-width="325"
+        data-height="600" data-small-header="false" data-adapt-container-width="false" data-hide-cover="false"
+        data-show-facepile="true">
+        <blockquote cite="https://www.facebook.com/TecnologicoLoja" class="fb-xfbml-parse-ignore">
+          <a href="https://www.facebook.com/TecnologicoLoja">Tecnológico Loja</a>
+        </blockquote>
+      </div>
+    </div>
+
+    <!-- TikTok -->
+    <div class="tiktok">
+      <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@tecnologicoloja" data-unique-id="tecnologicoloja"
+        data-embed-type="creator" data-width="325" data-height="600" style="width: 325px; height: 600px;">
+        <section>
+          <a target="_blank" href="https://www.tiktok.com/@tecnologicoloja">@tecnologicoloja</a>
+        </section>
+      </blockquote>
+      <script async src="https://www.tiktok.com/embed.js"></script>
+    </div>
+
+  </div>
+</div>
+
+<div id="fb-root"></div>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v18.0"
+  nonce="ISTLOJA">
+  </script>
+
+<div class="separador">
+  <h2>COMUNICADO OFICIAL</h2>
+  <div class="linea-turquesa"></div>
+</div>
+
+<div class="contenedor-imagen-central">
+  <img src="{% static 'img/comunicado.png' %}" alt="">
+</div>
+
+
+{% endblock %}
