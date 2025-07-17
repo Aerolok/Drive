@@ -1,3 +1,6 @@
+{% extends 'layout.html' %}
+
+{% block content %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -24,8 +27,6 @@
         <td>{{ c.nombre }}</td>
         <td>{{ c.descripcion }}</td>
         <td>
-          <button type="button" class="btn-editar-carpeta" data-id="{{ c.id }}">Editar</button>
-          <button type="button" class="btn-eliminar-carpeta" data-id="{{ c.id }}">Eliminar</button>
           <button type="button" class="btn-subir-archivo" data-id="{{ c.id }}">Subir Archivo</button>
         </td>
       </tr>
@@ -120,31 +121,6 @@
     // Crear carpeta
     document.getElementById('btnCrearCarpeta').onclick = () => abrirModal("{% url 'crear_carpeta' %}");
 
-    // Editar carpeta
-    document.querySelectorAll('.btn-editar-carpeta').forEach(btn => {
-      btn.onclick = () => abrirModal(`/editar_carpeta/${btn.dataset.id}/`);
-    });
-
-    // Eliminar carpeta
-    document.querySelectorAll('.btn-eliminar-carpeta').forEach(btn => {
-      btn.onclick = () => {
-        if (confirm('¿Eliminar carpeta?')) {
-          fetch(`/eliminar_carpeta/${btn.dataset.id}/`, {
-            method: 'POST',
-            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
-          })
-          .then(r => r.json())
-          .then(data => {
-            if (data.success) {
-              alert('Carpeta eliminada');
-              location.reload();
-            } else {
-              alert('Error al eliminar');
-            }
-          });
-        }
-      };
-    });
 
     // Subir archivo
     document.querySelectorAll('.btn-subir-archivo').forEach(btn => {
@@ -183,3 +159,4 @@
   </script>
 </body>
 </html>
+{% endblock %}
