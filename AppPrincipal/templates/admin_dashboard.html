@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard</title>
+  <style>
+    /* modal básico */
+    #modalUsuario, #modalCarpeta, #modalArchivo {
+      display: none;
+      position: fixed; 
+      top: 20%; 
+      left: 30%; 
+      background: white; 
+      border: 1px solid #ccc; 
+      padding: 20px; 
+      z-index: 999;
+      width: 40%;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+    #modalFondo {
+      display: none;
+      position: fixed; 
+      top:0; 
+      left:0; 
+      width:100%; 
+      height:100%; 
+      background:rgba(0,0,0,0.5); 
+      z-index: 998;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 5px;
+      text-align: left;
+    }
+    .carpeta-container {
+      margin-bottom: 30px;
+      border: 1px solid #999;
+      padding: 10px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Bienvenido Admin {{ request.user.username }}</h1>
+  <button id="btnCerrarSesion" onclick="window.location.href='{% url 'logout' %}'">Cerrar sesión</button>
+
+  <h2>Usuarios</h2>
+<button id="btnCrearUsuario">Crear usuario</button>
+<table>
+  <thead>
+    <tr><th>Usuario</th><th>Email</th><th>Acciones</th></tr>
+  </thead>
+  <tbody>
+    {% for u in usuarios %}
+      {% if not u.is_staff %}
+      <tr>
+        <td>{{ u.username }}</td>
+        <td>{{ u.email }}</td>
+        <td>
+          <button class="btn-editar" data-id="{{ u.id }}">Editar</button>
+          <button class="btn-eliminar" data-id="{{ u.id }}">Eliminar</button>
+        </td>
+      </tr>
+      {% endif %}
+    {% endfor %}
+  </tbody>
+</table>
+
+
+  <h2>Carpetas y Archivos</h2>
+
+  <button id="btnCrearCarpeta">Crear carpeta</button>
+
+  {% for c in carpetas %}
+  <div class="carpeta-container">
+    <h3>{{ c.nombre }} (Propietario: {{ c.usuario.username }})</h3>
+    <p>{{ c.descripcion }}</p>
+
+
+    <h4>Archivos en esta carpeta:</h4>
+{% if c.archivos.all %}
+<table>
+  <thead>
+    <tr>
+      <th>Archivo</th>
+      <th>Usuario</th>
+      <th>Fecha Subida</th>
+      <th>Ver</th>
+      <th>Descargar</th>
+      <th>Eliminar</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for archivo in c.archivos.all %}
+    <tr>
+      <td>{{ archivo.nombre }}</td>
+      <td>{{ archivo.usuario.username }}</td>
+      <td>{{ archivo.fecha_subida|date:"d/m/Y H:i" }}</td>
+      <td><a href="{{ archivo.archivo.url }}" target="_blank">Ver</a></td>
+      <td><a href="{{ archivo.archivo.url }}" download>Descargar</a></td>
+      <td>
+        <button type="button" onclick="eliminarArchivoAdmin({{ archivo.id }})">Eliminar</button>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No hay archivos en esta carpeta.</p>
+{% endif %}
+
+
+    <div style="margin-top: 10px;">
+      <button class="btn-editar-carpeta" data-id="{{ c.id }}">Editar Carpeta</button>
+      <button class="btn-eliminar-carpeta" data-id="{{ c.id }}">Eliminar Carpeta</button>
+    </div>
+  </div>
+  {% endfor %}
+
+  <!-- Fondo y modales -->
+  <div id="modalFondo"></div>
+  <div id="modalUsuario"></div>
+  <div id="modalCarpeta"></div>
+  <div id="modalArchivo"></div>
+
+<script>
+const modalFondo = document.getElementById('modalFondo');
+const modalUsuario = document.getElementById('modalUsuario');
+const modalCarpeta = document.getElementById('modalCarpeta');
+const modalArchivo = document.getElementById('modalArchivo');
+
+function abrirModal(modal, url) {
+  fetch(url)
+  .then(res => res.text())
+  .then(html => {
+    modal.innerHTML = html;
+    modal.style.display = 'block';
+    modalFondo.style.display = 'block';
+
+    const form = modal.querySelector('form');
+    if(form) {
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        fetch(url, {
+          method: 'POST',
+          headers: {'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value},
+          body: formData
+        })
+        .then(r => r.json())
+        .then(data => {
+          if(data.success){
+            alert('Operación exitosa');
+            cerrarModal();
+            location.reload();
+          } else {
+            alert('Errores: ' + JSON.stringify(data.errors));
+          }
+        });
+      });
+    }
+  });
+}
+
+function cerrarModal() {
+  modalUsuario.style.display = 'none';
+  modalCarpeta.style.display = 'none';
+  modalArchivo.style.display = 'none';
+  modalFondo.style.display = 'none';
+  modalUsuario.innerHTML = '';
+  modalCarpeta.innerHTML = '';
+  modalArchivo.innerHTML = '';
+}
+
+// Crear usuario
+document.getElementById('btnCrearUsuario').onclick = () => abrirModal(modalUsuario, "{% url 'crear_usuario' %}");
+
+// Editar usuario
+document.querySelectorAll('.btn-editar').forEach(btn => {
+  btn.onclick = () => abrirModal(modalUsuario, `/editar_usuario/${btn.dataset.id}/`);
+});
+
+// Eliminar usuario
+document.querySelectorAll('.btn-eliminar').forEach(btn => {
+  btn.onclick = () => {
+    if(confirm('¿Eliminar usuario?')){
+      fetch(`/eliminar_usuario/${btn.dataset.id}/`, {
+        method: 'POST',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+      })
+      .then(r => r.json())
+      .then(data => {
+        if(data.success){
+          alert('Usuario eliminado');
+          location.reload();
+        } else {
+          alert('Error al eliminar');
+        }
+      });
+    }
+  }
+});
+
+// Crear carpeta
+document.getElementById('btnCrearCarpeta').onclick = () => abrirModal(modalCarpeta, "{% url 'crear_carpeta' %}");
+
+// Editar carpeta
+document.querySelectorAll('.btn-editar-carpeta').forEach(btn => {
+  btn.onclick = () => abrirModal(modalCarpeta, `/editar_carpeta/${btn.dataset.id}/`);
+});
+
+// Eliminar carpeta
+document.querySelectorAll('.btn-eliminar-carpeta').forEach(btn => {
+  btn.onclick = () => {
+    if(confirm('¿Eliminar carpeta?')){
+      fetch(`/eliminar_carpeta/${btn.dataset.id}/`, {
+        method: 'POST',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+      })
+      .then(r => r.json())
+      .then(data => {
+        if(data.success){
+          alert('Carpeta eliminada');
+          location.reload();
+        } else {
+          alert('Error al eliminar');
+        }
+      });
+    }
+  }
+});
+
+function eliminarArchivoAdmin(id) {
+  if (confirm('¿Eliminar este archivo?')) {
+    const formData = new FormData();
+    formData.append('archivo_id', id);
+
+    fetch(`/eliminar_archivo/${id}/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}'
+      },
+      body: formData
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        alert('Archivo eliminado correctamente');
+        location.reload();
+      } else {
+        alert('Error al eliminar archivo');
+      }
+    })
+    .catch(() => alert('Error en la solicitud'));
+  }
+}
+
+
+
+
+// Cerrar modal si se hace click fuera
+modalFondo.onclick = cerrarModal;
+</script>
+</body>
+</html>
