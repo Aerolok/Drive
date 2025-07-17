@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard Usuario</title>
+</head>
+<body>
+  <h1>Bienvenido {{ request.user.username }}</h1>
+  <button type="button" onclick="window.location.href='{% url 'logout' %}'">Cerrar sesión</button>
+
+  <h2>Mis Carpetas</h2>
+  <button id="btnCrearCarpeta" type="button">Agregar Carpeta</button>
+
+  <table border="1" cellpadding="5" cellspacing="0">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in carpetas %}
+      <tr>
+        <td>{{ c.nombre }}</td>
+        <td>{{ c.descripcion }}</td>
+        <td>
+          <button type="button" class="btn-editar-carpeta" data-id="{{ c.id }}">Editar</button>
+          <button type="button" class="btn-eliminar-carpeta" data-id="{{ c.id }}">Eliminar</button>
+          <button type="button" class="btn-subir-archivo" data-id="{{ c.id }}">Subir Archivo</button>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="3">No tienes carpetas.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h2>Mis Archivos</h2>
+  <table border="1" cellpadding="5" cellspacing="0">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Carpeta</th>
+        <th>Fecha</th>
+        <th>Descargar</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for archivo in archivos %}
+      <tr>
+        <td>{{ archivo.nombre }}</td>
+        <td>{{ archivo.carpeta.nombre }}</td>
+        <td>{{ archivo.fecha_subida|date:"Y-m-d H:i" }}</td>
+        <td><a href="{{ archivo.archivo.url }}" target="_blank" rel="noopener noreferrer">Ver</a></td>
+        <td>
+          <button type="button" onclick="editarArchivo({{ archivo.id }}); event.preventDefault();">Editar</button>
+          <button type="button" onclick="eliminarArchivo({{ archivo.id }}); event.preventDefault();">Eliminar</button>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5">No tienes archivos.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Modal personalizado -->
+  <div id="modalFondo" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:998;"></div>
+  <div id="modalCarpeta" style="display:none; position:fixed; top:20%; left:30%; background:#fff; padding:20px; border:1px solid #ccc; width:40%; z-index:999;"></div>
+
+  <script>
+    const modalFondo = document.getElementById('modalFondo');
+    const modalCarpeta = document.getElementById('modalCarpeta');
+
+    function abrirModal(url) {
+      fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          modalCarpeta.innerHTML = html;
+          modalCarpeta.style.display = 'block';
+          modalFondo.style.display = 'block';
+
+          const form = modalCarpeta.querySelector('form');
+          if (form) {
+            form.addEventListener('submit', e => {
+              e.preventDefault();
+              const formData = new FormData(form);
+              fetch(url, {
+                method: 'POST',
+                headers: {
+                  'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: formData
+              })
+              .then(r => r.json())
+              .then(data => {
+                if (data.success) {
+                  alert('Operación exitosa');
+                  cerrarModal();
+                  location.reload();
+                } else {
+                  alert('Errores: ' + JSON.stringify(data.errors));
+                }
+              });
+            });
+          }
+        });
+    }
+
+    function cerrarModal() {
+      modalCarpeta.style.display = 'none';
+      modalFondo.style.display = 'none';
+      modalCarpeta.innerHTML = '';
+    }
+
+    // Crear carpeta
+    document.getElementById('btnCrearCarpeta').onclick = () => abrirModal("{% url 'crear_carpeta' %}");
+
+    // Editar carpeta
+    document.querySelectorAll('.btn-editar-carpeta').forEach(btn => {
+      btn.onclick = () => abrirModal(`/editar_carpeta/${btn.dataset.id}/`);
+    });
+
+    // Eliminar carpeta
+    document.querySelectorAll('.btn-eliminar-carpeta').forEach(btn => {
+      btn.onclick = () => {
+        if (confirm('¿Eliminar carpeta?')) {
+          fetch(`/eliminar_carpeta/${btn.dataset.id}/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+          })
+          .then(r => r.json())
+          .then(data => {
+            if (data.success) {
+              alert('Carpeta eliminada');
+              location.reload();
+            } else {
+              alert('Error al eliminar');
+            }
+          });
+        }
+      };
+    });
+
+    // Subir archivo
+    document.querySelectorAll('.btn-subir-archivo').forEach(btn => {
+      btn.onclick = () => abrirModal(`/subir_archivo/${btn.dataset.id}/`);
+    });
+
+    // Editar archivo
+    function editarArchivo(id) {
+      abrirModal(`/editar_archivo/${id}/`);
+    }
+
+    // Eliminar archivo
+    function eliminarArchivo(id) {
+      if (!confirm('¿Eliminar archivo?')) return;
+
+      fetch(`/eliminar_archivo/${id}/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}',
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Archivo eliminado');
+          location.reload();
+        } else {
+          alert('Error al eliminar');
+        }
+      })
+      .catch(() => alert('Error en la solicitud'));
+    }
+
+    modalFondo.onclick = cerrarModal;
+  </script>
+</body>
+</html>

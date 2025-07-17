@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Editar Archivo</title>
+</head>
+<body>
+  <h1>Editar Archivo</h1>
+  <form method="POST" enctype="multipart/form-data" id="formEditarArchivo">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Guardar Cambios</button>
+  </form>
+
+  <button onclick="window.location.href='{% url 'dashboard' %}'">Volver al Dashboard</button>
+
+  <script>
+    const form = document.getElementById('formEditarArchivo');
+
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
+      const formData = new FormData(form);
+
+      fetch("", {
+        method: "POST",
+        headers: {
+          'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if(data.success){
+          alert('Archivo actualizado correctamente');
+          window.location.href = "{% url 'dashboard' %}";
+        } else {
+          alert('Error al actualizar archivo: ' + JSON.stringify(data.errors));
+        }
+      })
+      .catch(error => {
+        alert('Error en la solicitud');
+        console.error(error);
+      });
+    });
+  </script>
+</body>
+</html>
