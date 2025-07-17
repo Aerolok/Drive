@@ -4,14 +4,14 @@
 <div class="admin-panel">
 
   <h1 class="titulo-principal">Bienvenido, Usuario {{ request.user.username }}</h1>
-  <button class="btn" onclick="window.location.href='{% url 'logout' %}'">Cerrar sesión</button>
 
   <hr class="linea-turquesa">
 
   <section class="carpetas-section">
     <div class="section-header">
       <h2 class="titulo-seccion">Mis Carpetas</h2>
-      <button id="btnCrearCarpeta" class="btn">Agregar Carpeta</button>
+      <!-- Botón Crear Carpeta eliminado -->
+      <!-- <button id="btnCrearCarpeta" class="btn">Agregar Carpeta</button> -->
     </div>
 
     <table class="tabla-estilo">
@@ -81,90 +81,128 @@
 <div id="modalFondo" class="modal-fondo" style="display: none;"></div>
 <div id="modalCarpeta" class="modal-carpeta" style="display: none;"></div>
 
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-  <script>
-    const modalFondo = document.getElementById('modalFondo');
-    const modalCarpeta = document.getElementById('modalCarpeta');
+<script>
+  const modalFondo = document.getElementById('modalFondo');
+  const modalCarpeta = document.getElementById('modalCarpeta');
 
-    function abrirModal(url) {
-      fetch(url)
-        .then(res => res.text())
-        .then(html => {
-          modalCarpeta.innerHTML = html;
-          modalCarpeta.style.display = 'block';
-          modalFondo.style.display = 'block';
+  function abrirModal(url) {
+    fetch(url)
+      .then(res => res.text())
+      .then(html => {
+        modalCarpeta.innerHTML = html;
+        modalCarpeta.style.display = 'block';
+        modalFondo.style.display = 'block';
 
-          const form = modalCarpeta.querySelector('form');
-          if (form) {
-            form.addEventListener('submit', e => {
-              e.preventDefault();
-              const formData = new FormData(form);
-              fetch(url, {
-                method: 'POST',
-                headers: {
-                  'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value
-                },
-                body: formData
-              })
-              .then(r => r.json())
-              .then(data => {
-                if (data.success) {
-                  alert('Operación exitosa');
-                  cerrarModal();
-                  location.reload();
-                } else {
-                  alert('Errores: ' + JSON.stringify(data.errors));
-                }
-              });
+        const form = modalCarpeta.querySelector('form');
+        if (form) {
+          form.addEventListener('submit', e => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            fetch(url, {
+              method: 'POST',
+              headers: {
+                'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value
+              },
+              body: formData
+            })
+            .then(r => r.json())
+            .then(data => {
+              if (data.success) {
+                Swal.fire({
+                  icon: 'success',
+                  title: '¡Éxito!',
+                  text: 'Operación exitosa',
+                  timer: 2000,
+                  showConfirmButton: false
+                });
+                cerrarModal();
+                setTimeout(() => location.reload(), 2000);
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error de validación',
+                  html: '<pre>' + JSON.stringify(data.errors, null, 2) + '</pre>'
+                });
+              }
+            });
+          });
+        }
+      });
+  }
+
+  function cerrarModal() {
+    modalCarpeta.style.display = 'none';
+    modalFondo.style.display = 'none';
+    modalCarpeta.innerHTML = '';
+  }
+
+  // Crear carpeta (solo si el botón existe)
+  const btnCrearCarpeta = document.getElementById('btnCrearCarpeta');
+  if (btnCrearCarpeta) {
+    btnCrearCarpeta.onclick = () => abrirModal("{% url 'crear_carpeta' %}");
+  }
+
+  // Subir archivo
+  document.querySelectorAll('.btn-subir-archivo').forEach(btn => {
+    btn.onclick = () => abrirModal(`/subir_archivo/${btn.dataset.id}/`);
+  });
+
+  // Editar archivo
+  function editarArchivo(id) {
+    abrirModal(`/editar_archivo/${id}/`);
+  }
+
+  // Eliminar archivo
+  function eliminarArchivo(id) {
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: "Esta acción eliminará el archivo",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(`/eliminar_archivo/${id}/`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Eliminado',
+              text: 'Archivo eliminado correctamente',
+              timer: 2000,
+              showConfirmButton: false
+            });
+            setTimeout(() => location.reload(), 2000);
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'No se pudo eliminar el archivo'
             });
           }
+        })
+        .catch(() => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error de red',
+            text: 'No se pudo conectar al servidor'
+          });
         });
-    }
-
-    function cerrarModal() {
-      modalCarpeta.style.display = 'none';
-      modalFondo.style.display = 'none';
-      modalCarpeta.innerHTML = '';
-    }
-
-    // Crear carpeta
-    document.getElementById('btnCrearCarpeta').onclick = () => abrirModal("{% url 'crear_carpeta' %}");
-
-
-    // Subir archivo
-    document.querySelectorAll('.btn-subir-archivo').forEach(btn => {
-      btn.onclick = () => abrirModal(`/subir_archivo/${btn.dataset.id}/`);
+      }
     });
+  }
 
-    // Editar archivo
-    function editarArchivo(id) {
-      abrirModal(`/editar_archivo/${id}/`);
-    }
-
-    // Eliminar archivo
-    function eliminarArchivo(id) {
-      if (!confirm('¿Eliminar archivo?')) return;
-
-      fetch(`/eliminar_archivo/${id}/`, {
-        method: 'POST',
-        headers: {
-          'X-CSRFToken': '{{ csrf_token }}',
-          'Content-Type': 'application/json'
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          alert('Archivo eliminado');
-          location.reload();
-        } else {
-          alert('Error al eliminar');
-        }
-      })
-      .catch(() => alert('Error en la solicitud'));
-    }
-
-    modalFondo.onclick = cerrarModal;
-  </script>
-</body>
+  modalFondo.onclick = cerrarModal;
+</script>
 {% endblock %}
