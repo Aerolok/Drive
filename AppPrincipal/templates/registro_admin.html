@@ -1,13 +1,13 @@
-<!DOCTYPE html>
-<html>
-<head><title>Registro Admin</title></head>
-<body>
+{% extends 'baselogin.html' %}
+
+{% block content %}
+<div class="login-container">
   <h2>Registrar administrador</h2>
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Registrar</button>
   </form>
-  <p><a href="{% url 'login' %}">Volver al login</a></p>
-</body>
-</html>
+  <p class="registro"><a href="{% url 'login' %}">Volver al login</a></p>
+</div>
+{% endblock %}

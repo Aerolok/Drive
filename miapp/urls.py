@@ -5,7 +5,8 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('AppPrincipal.urls')),  # o el nombre de tu app
+    path('', include('AppPrincipal.urls')),  # Incluye las URLs de AppPrincipal en la raíz
+    
 ]
 
 if settings.DEBUG:

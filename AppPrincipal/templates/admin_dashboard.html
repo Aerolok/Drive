@@ -1,131 +1,105 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Admin Dashboard</title>
-  <style>
-    /* modal básico */
-    #modalUsuario, #modalCarpeta, #modalArchivo {
-      display: none;
-      position: fixed; 
-      top: 20%; 
-      left: 30%; 
-      background: white; 
-      border: 1px solid #ccc; 
-      padding: 20px; 
-      z-index: 999;
-      width: 40%;
-      max-height: 70vh;
-      overflow-y: auto;
-    }
-    #modalFondo {
-      display: none;
-      position: fixed; 
-      top:0; 
-      left:0; 
-      width:100%; 
-      height:100%; 
-      background:rgba(0,0,0,0.5); 
-      z-index: 998;
-    }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 5px;
-      text-align: left;
-    }
-    .carpeta-container {
-      margin-bottom: 30px;
-      border: 1px solid #999;
-      padding: 10px;
-      border-radius: 4px;
-    }
-  </style>
-</head>
-<body>
-  <h1>Bienvenido Admin {{ request.user.username }}</h1>
-  <button id="btnCerrarSesion" onclick="window.location.href='{% url 'logout' %}'">Cerrar sesión</button>
+{% extends 'layout.html' %}
 
-  <h2>Usuarios</h2>
-<button id="btnCrearUsuario">Crear usuario</button>
-<table>
-  <thead>
-    <tr><th>Usuario</th><th>Email</th><th>Acciones</th></tr>
-  </thead>
-  <tbody>
-    {% for u in usuarios %}
-      {% if not u.is_staff %}
-      <tr>
-        <td>{{ u.username }}</td>
-        <td>{{ u.email }}</td>
-        <td>
-          <button class="btn-editar" data-id="{{ u.id }}">Editar</button>
-          <button class="btn-eliminar" data-id="{{ u.id }}">Eliminar</button>
-        </td>
-      </tr>
-      {% endif %}
-    {% endfor %}
-  </tbody>
-</table>
-
-
-  <h2>Carpetas y Archivos</h2>
-
-  <button id="btnCrearCarpeta">Crear carpeta</button>
-
-  {% for c in carpetas %}
-  <div class="carpeta-container">
-    <h3>{{ c.nombre }} (Propietario: {{ c.usuario.username }})</h3>
-    <p>{{ c.descripcion }}</p>
-
-
-    <h4>Archivos en esta carpeta:</h4>
-{% if c.archivos.all %}
-<table>
-  <thead>
-    <tr>
-      <th>Archivo</th>
-      <th>Usuario</th>
-      <th>Fecha Subida</th>
-      <th>Ver</th>
-      <th>Descargar</th>
-      <th>Eliminar</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for archivo in c.archivos.all %}
-    <tr>
-      <td>{{ archivo.nombre }}</td>
-      <td>{{ archivo.usuario.username }}</td>
-      <td>{{ archivo.fecha_subida|date:"d/m/Y H:i" }}</td>
-      <td><a href="{{ archivo.archivo.url }}" target="_blank">Ver</a></td>
-      <td><a href="{{ archivo.archivo.url }}" download>Descargar</a></td>
-      <td>
-        <button type="button" onclick="eliminarArchivoAdmin({{ archivo.id }})">Eliminar</button>
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-{% else %}
-<p>No hay archivos en esta carpeta.</p>
-{% endif %}
-
-
-    <div style="margin-top: 10px;">
-      <button class="btn-editar-carpeta" data-id="{{ c.id }}">Editar Carpeta</button>
-      <button class="btn-eliminar-carpeta" data-id="{{ c.id }}">Eliminar Carpeta</button>
-    </div>
+{% block content %}
+<div class="admin-panel">
+  <div class="admin-header">
+    <h1>Bienvenido, {{ request.user.username }}</h1>
   </div>
-  {% endfor %}
 
-  <!-- Fondo y modales -->
-  <div id="modalFondo"></div>
-  <div id="modalUsuario"></div>
-  <div id="modalCarpeta"></div>
-  <div id="modalArchivo"></div>
+  <hr class="linea-turquesa">
+
+  <section class="usuarios-section">
+    <div class="section-header">
+      <h2>Gestión de Usuarios</h2>
+      <button id="btnCrearUsuario" class="btn-principal">+ Crear usuario</button>
+    </div>
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>Usuario</th>
+          <th>Email</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in usuarios %}
+          {% if not u.is_staff %}
+          <tr>
+            <td>{{ u.username }}</td>
+            <td>{{ u.email }}</td>
+            <td>
+              <button class="btn-accion btn-editar" data-id="{{ u.id }}">Editar</button>
+              <button class="btn-accion btn-eliminar" data-id="{{ u.id }}">Eliminar</button>
+            </td>
+          </tr>
+          {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <hr class="linea-turquesa">
+
+  <section class="carpetas-section">
+    <div class="section-header">
+      <h2>Carpetas y Archivos</h2>
+      <button id="btnCrearCarpeta" class="btn-principal">+ Crear carpeta</button>
+    </div>
+
+    {% for c in carpetas %}
+    <div class="carpeta-container">
+      <div class="carpeta-info">
+        <h3>{{ c.nombre }}</h3>
+        <p><strong>Propietario:</strong> {{ c.usuario.username }}</p>
+        <p>{{ c.descripcion }}</p>
+      </div>
+
+      <div class="carpeta-archivos">
+        <h4>Archivos:</h4>
+        {% if c.archivos.all %}
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>Archivo</th>
+              <th>Usuario</th>
+              <th>Fecha Subida</th>
+              <th>Ver</th>
+              <th>Descargar</th>
+              <th>Eliminar</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for archivo in c.archivos.all %}
+            <tr>
+              <td>{{ archivo.nombre }}</td>
+              <td>{{ archivo.usuario.username }}</td>
+              <td>{{ archivo.fecha_subida|date:"d/m/Y H:i" }}</td>
+              <td><a href="{{ archivo.archivo.url }}" target="_blank">Ver</a></td>
+              <td><a href="{{ archivo.archivo.url }}" download>Descargar</a></td>
+              <td><button class="btn-accion" onclick="eliminarArchivoAdmin({{ archivo.id }})">Eliminar</button></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <p class="mensaje-vacio">No hay archivos en esta carpeta.</p>
+        {% endif %}
+      </div>
+
+      <div class="carpeta-acciones">
+        <button class="btn-accion btn-editar-carpeta" data-id="{{ c.id }}">Editar Carpeta</button>
+        <button class="btn-accion btn-eliminar-carpeta" data-id="{{ c.id }}">Eliminar Carpeta</button>
+      </div>
+    </div>
+    {% endfor %}
+  </section>
+
+  <!-- Ventanas modales flotantes -->
+  <div id="modalFondo" class="modal-fondo"></div>
+  <div id="modalUsuario" class="modal-contenedor"></div>
+  <div id="modalCarpeta" class="modal-contenedor"></div>
+  <div id="modalArchivo" class="modal-contenedor"></div>
+</div>
 
 <script>
 const modalFondo = document.getElementById('modalFondo');
@@ -265,5 +239,6 @@ function eliminarArchivoAdmin(id) {
 // Cerrar modal si se hace click fuera
 modalFondo.onclick = cerrarModal;
 </script>
-</body>
-</html>
+
+{% endblock %}
+

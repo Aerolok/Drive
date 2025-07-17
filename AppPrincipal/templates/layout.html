@@ -1,4 +1,3 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 
@@ -7,21 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Instituto Tecnológico Loja</title>
 
+    {% load static %}
     <link rel="stylesheet" href="{% static 'css/layout.css' %}">
-    <link rel="stylesheet" href="{% static 'css/inicio.css' %}">
-    
+    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
 </head>
 
 <body>
     <!-- Header -->
     <header>
-        <a href="{% url 'inicio' %}">
+        <a>
             <img src="{% static 'img/LOGOlateralnormal.png' %}" alt="Logo Tecnológico Loja">
         </a>
 
         <nav>
             <ul>
-                <li><a href="{% url 'inicio' %}">Inicio</a></li>
+                <li><a href="{% url 'dashboard' %}">Inicio</a></li>
+                <li><a href="{% url 'logout' %}">Cerrar sesión</a></li>
             </ul>
         </nav>
     </header>

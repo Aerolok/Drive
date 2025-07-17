@@ -97,3 +97,6 @@ MEDIA_ROOT = BASE_DIR / 'media'  # Asegúrate de crear esta carpeta también
 
 # Tipo de campo de clave primaria por defecto
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# settings.py
+LOGIN_URL = 'login'               # Indica a Django que use esta URL para login
+LOGIN_REDIRECT_URL = 'dashboard' # Después de login exitoso, redirige a dashboard

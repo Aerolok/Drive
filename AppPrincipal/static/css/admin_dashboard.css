@@ -1,0 +1,193 @@
+.admin-panel {
+    font-family: 'RulerLight', sans-serif;
+    background-color: #ffffff; /* fondo blanco limpio */
+    color: #003366; /* azul oscuro para textos */
+    padding: 2rem;
+}
+
+.admin-panel h1 {
+    font-family: 'RulerBold', sans-serif;
+    font-size: 2.2rem;
+    color: #003366;
+    margin-bottom: 1.5rem;
+}
+
+.admin-panel h2 {
+    font-family: 'RulerBold', sans-serif;
+    font-size: 1.8rem;
+    color: #003366;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.admin-panel h3,
+.admin-panel h4 {
+    font-family: 'RulerLightItalic', sans-serif;
+    margin: 0.5rem 0;
+    color: #002244;
+}
+
+/* Botones con estilo inspirado en .cuadro-oferta */
+.admin-panel button,
+.admin-panel a.button-link {
+    font-family: 'RulerLight', sans-serif;
+    font-weight: 700;
+    background-color: #003366;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px 0 10px 0;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.15);
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    border-bottom: 3px solid #46A29F;
+    display: inline-block;
+    text-align: center;
+    text-decoration: none;
+    margin-bottom: 1.2rem; /* Para separación debajo del botón */
+}
+
+.admin-panel button:hover,
+.admin-panel a.button-link:hover {
+    background-color: #005a9c;
+    transform: scale(1.05);
+}
+
+.admin-panel .btn-editar,
+.admin-panel .btn-eliminar,
+.admin-panel .btn-editar-carpeta,
+.admin-panel .btn-eliminar-carpeta {
+    padding: 6px 14px;
+    font-size: 0.9rem;
+    border-radius: 6px 0 6px 0;
+    box-shadow: 1.5px 1.5px 5px rgba(0, 0, 0, 0.1);
+    border-bottom: 2px solid #46A29F;
+}
+
+.admin-panel table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 2rem;
+    font-family: 'RulerLight', sans-serif;
+    color: #003366;
+}
+
+.admin-panel table,
+.admin-panel th,
+.admin-panel td {
+    border: 1px solid #003366;
+}
+
+.admin-panel th,
+.admin-panel td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.admin-panel thead {
+    background-color: #f0f4f8;
+    color: #003366;
+    font-family: 'RulerBold', sans-serif;
+}
+
+.admin-panel .carpeta-container {
+    background-color: #ffffff;
+    border-left: 4px solid #003366;
+    padding: 1.2rem 1.5rem;
+    margin-bottom: 1.8rem;
+    box-shadow: 0 0 12px rgba(0, 51, 102, 0.1);
+    border-radius: 6px;
+}
+
+.admin-panel .carpeta-acciones {
+    margin-top: 1.2rem;
+}
+
+.admin-panel #modalFondo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 51, 102, 0.45);
+    z-index: 1000;
+    display: none;
+}
+
+.admin-panel #modalUsuario,
+.admin-panel #modalCarpeta,
+.admin-panel #modalArchivo {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    padding: 2rem 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 51, 102, 0.25);
+    z-index: 1001;
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    display: none;
+    font-family: 'RulerLight', sans-serif;
+    color: #003366;
+}
+
+.admin-panel a {
+    color: #003366;
+    text-decoration: none;
+    font-family: 'RulerLight', sans-serif;
+    transition: color 0.25s ease;
+}
+
+.admin-panel a:hover {
+    text-decoration: underline;
+    color: #46A29F;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+    .admin-panel h1,
+    .admin-panel h2 {
+        font-size: 1.5rem;
+    }
+
+    .admin-panel table,
+    .admin-panel thead,
+    .admin-panel tbody,
+    .admin-panel th,
+    .admin-panel td,
+    .admin-panel tr {
+        display: block;
+    }
+
+    .admin-panel th,
+    .admin-panel td {
+        padding: 0.5rem;
+        border: none;
+        border-bottom: 1px solid #003366;
+    }
+
+    .admin-panel th {
+        background-color: transparent;
+        font-weight: 700;
+    }
+
+    .admin-panel td {
+        text-align: right;
+    }
+
+    .admin-panel td::before {
+        content: attr(data-label);
+        float: left;
+        font-weight: 700;
+    }
+
+    .admin-panel button {
+        width: 100%;
+        margin-top: 0.6rem;
+    }
+}
