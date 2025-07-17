@@ -1,77 +1,86 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Dashboard Usuario</title>
-</head>
-<body>
-  <h1>Bienvenido {{ request.user.username }}</h1>
-  <button type="button" onclick="window.location.href='{% url 'logout' %}'">Cerrar sesión</button>
+<div class="admin-panel">
 
-  <h2>Mis Carpetas</h2>
-  <button id="btnCrearCarpeta" type="button">Agregar Carpeta</button>
+  <h1 class="titulo-principal">Bienvenido, Usuario {{ request.user.username }}</h1>
+  <button class="btn" onclick="window.location.href='{% url 'logout' %}'">Cerrar sesión</button>
 
-  <table border="1" cellpadding="5" cellspacing="0">
-    <thead>
-      <tr>
-        <th>Nombre</th>
-        <th>Descripción</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for c in carpetas %}
-      <tr>
-        <td>{{ c.nombre }}</td>
-        <td>{{ c.descripcion }}</td>
-        <td>
-          <button type="button" class="btn-subir-archivo" data-id="{{ c.id }}">Subir Archivo</button>
-        </td>
-      </tr>
-      {% empty %}
-      <tr>
-        <td colspan="3">No tienes carpetas.</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <hr class="linea-turquesa">
 
-  <h2>Mis Archivos</h2>
-  <table border="1" cellpadding="5" cellspacing="0">
-    <thead>
-      <tr>
-        <th>Nombre</th>
-        <th>Carpeta</th>
-        <th>Fecha</th>
-        <th>Descargar</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for archivo in archivos %}
-      <tr>
-        <td>{{ archivo.nombre }}</td>
-        <td>{{ archivo.carpeta.nombre }}</td>
-        <td>{{ archivo.fecha_subida|date:"Y-m-d H:i" }}</td>
-        <td><a href="{{ archivo.archivo.url }}" target="_blank" rel="noopener noreferrer">Ver</a></td>
-        <td>
-          <button type="button" onclick="editarArchivo({{ archivo.id }}); event.preventDefault();">Editar</button>
-          <button type="button" onclick="eliminarArchivo({{ archivo.id }}); event.preventDefault();">Eliminar</button>
-        </td>
-      </tr>
-      {% empty %}
-      <tr>
-        <td colspan="5">No tienes archivos.</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <section class="carpetas-section">
+    <div class="section-header">
+      <h2 class="titulo-seccion">Mis Carpetas</h2>
+      <button id="btnCrearCarpeta" class="btn">Agregar Carpeta</button>
+    </div>
 
-  <!-- Modal personalizado -->
-  <div id="modalFondo" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:998;"></div>
-  <div id="modalCarpeta" style="display:none; position:fixed; top:20%; left:30%; background:#fff; padding:20px; border:1px solid #ccc; width:40%; z-index:999;"></div>
+    <table class="tabla-estilo">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in carpetas %}
+        <tr>
+          <td>{{ c.nombre }}</td>
+          <td>{{ c.descripcion }}</td>
+          <td>
+            <button type="button" class="btn btn-subir-archivo" data-id="{{ c.id }}">Subir Archivo</button>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="3">No tienes carpetas.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <hr class="linea-turquesa">
+
+  <section class="archivos-section">
+    <h2 class="titulo-seccion">Mis Archivos</h2>
+    <table class="tabla-estilo">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Carpeta</th>
+          <th>Fecha</th>
+          <th>Descargar</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for archivo in archivos %}
+        <tr>
+          <td>{{ archivo.nombre }}</td>
+          <td>{{ archivo.carpeta.nombre }}</td>
+          <td>{{ archivo.fecha_subida|date:"Y-m-d H:i" }}</td>
+          <td><a href="{{ archivo.archivo.url }}" target="_blank" class="link-archivo">Ver</a></td>
+          <td>
+            <button class="btn" onclick="editarArchivo({{ archivo.id }}); event.preventDefault();">Editar</button>
+            <button class="btn" onclick="eliminarArchivo({{ archivo.id }}); event.preventDefault();">Eliminar</button>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5">No tienes archivos.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+</div>
+
+<!-- Modal personalizado -->
+<div id="modalFondo" class="modal-fondo" style="display: none;"></div>
+<div id="modalCarpeta" class="modal-carpeta" style="display: none;"></div>
+
 
   <script>
     const modalFondo = document.getElementById('modalFondo');
@@ -158,5 +167,4 @@
     modalFondo.onclick = cerrarModal;
   </script>
 </body>
-</html>
 {% endblock %}
