@@ -35,10 +35,15 @@
                 <td>
                   <a href="{{ archivo.archivo.url }}" target="_blank" class="link-archivo">Ver</a>
                 </td>
-                <td>
-                  <button class="btn" onclick="editarArchivo({{ archivo.id }}); event.preventDefault();">Editar</button>
-                  <button class="btn" onclick="eliminarArchivo({{ archivo.id }}); event.preventDefault();">Eliminar</button>
+               <td>
+                <button class="btn btn-icon" onclick="editarArchivo({{ archivo.id }}); event.preventDefault();" title="Editar">
+                <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-icon" onclick="eliminarArchivo({{ archivo.id }}); event.preventDefault();" title="Eliminar">
+                <i class="fas fa-trash-alt"></i>
+                </button>
                 </td>
+
               </tr>
             {% endfor %}
           {% else %}
