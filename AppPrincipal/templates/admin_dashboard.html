@@ -101,6 +101,9 @@
   <div id="modalArchivo" class="modal-contenedor"></div>
 </div>
 
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 const modalFondo = document.getElementById('modalFondo');
 const modalUsuario = document.getElementById('modalUsuario');
@@ -128,11 +131,21 @@ function abrirModal(modal, url) {
         .then(r => r.json())
         .then(data => {
           if(data.success){
-            alert('Operación exitosa');
+            Swal.fire({
+              icon: 'success',
+              title: '¡Éxito!',
+              text: 'Operación realizada correctamente',
+              timer: 2000,
+              showConfirmButton: false
+            });
             cerrarModal();
-            location.reload();
+            setTimeout(() => location.reload(), 2000);
           } else {
-            alert('Errores: ' + JSON.stringify(data.errors));
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Errores: ' + JSON.stringify(data.errors)
+            });
           }
         });
       });
@@ -161,21 +174,35 @@ document.querySelectorAll('.btn-editar').forEach(btn => {
 // Eliminar usuario
 document.querySelectorAll('.btn-eliminar').forEach(btn => {
   btn.onclick = () => {
-    if(confirm('¿Eliminar usuario?')){
-      fetch(`/eliminar_usuario/${btn.dataset.id}/`, {
-        method: 'POST',
-        headers: {'X-CSRFToken': '{{ csrf_token }}'},
-      })
-      .then(r => r.json())
-      .then(data => {
-        if(data.success){
-          alert('Usuario eliminado');
-          location.reload();
-        } else {
-          alert('Error al eliminar');
-        }
-      });
-    }
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: "Esta acción eliminará al usuario",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then(result => {
+      if(result.isConfirmed){
+        fetch(`/eliminar_usuario/${btn.dataset.id}/`, {
+          method: 'POST',
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+        })
+        .then(r => r.json())
+        .then(data => {
+          if(data.success){
+            Swal.fire({
+              icon: 'success',
+              title: 'Usuario eliminado',
+              timer: 2000,
+              showConfirmButton: false
+            });
+            setTimeout(() => location.reload(), 2000);
+          } else {
+            Swal.fire('Error', 'No se pudo eliminar el usuario', 'error');
+          }
+        });
+      }
+    });
   }
 });
 
@@ -190,55 +217,78 @@ document.querySelectorAll('.btn-editar-carpeta').forEach(btn => {
 // Eliminar carpeta
 document.querySelectorAll('.btn-eliminar-carpeta').forEach(btn => {
   btn.onclick = () => {
-    if(confirm('¿Eliminar carpeta?')){
-      fetch(`/eliminar_carpeta/${btn.dataset.id}/`, {
-        method: 'POST',
-        headers: {'X-CSRFToken': '{{ csrf_token }}'},
-      })
-      .then(r => r.json())
-      .then(data => {
-        if(data.success){
-          alert('Carpeta eliminada');
-          location.reload();
-        } else {
-          alert('Error al eliminar');
-        }
-      });
-    }
+    Swal.fire({
+      title: '¿Eliminar carpeta?',
+      text: "Esta acción no se puede deshacer",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then(result => {
+      if(result.isConfirmed){
+        fetch(`/eliminar_carpeta/${btn.dataset.id}/`, {
+          method: 'POST',
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+        })
+        .then(r => r.json())
+        .then(data => {
+          if(data.success){
+            Swal.fire({
+              icon: 'success',
+              title: 'Carpeta eliminada',
+              timer: 2000,
+              showConfirmButton: false
+            });
+            setTimeout(() => location.reload(), 2000);
+          } else {
+            Swal.fire('Error', 'No se pudo eliminar la carpeta', 'error');
+          }
+        });
+      }
+    });
   }
 });
 
 function eliminarArchivoAdmin(id) {
-  if (confirm('¿Eliminar este archivo?')) {
-    const formData = new FormData();
-    formData.append('archivo_id', id);
+  Swal.fire({
+    title: '¿Eliminar archivo?',
+    text: "Esta acción no se puede deshacer",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar'
+  }).then(result => {
+    if(result.isConfirmed){
+      const formData = new FormData();
+      formData.append('archivo_id', id);
 
-    fetch(`/eliminar_archivo/${id}/`, {
-      method: 'POST',
-      headers: {
-        'X-CSRFToken': '{{ csrf_token }}'
-      },
-      body: formData
-    })
-    .then(r => r.json())
-    .then(data => {
-      if (data.success) {
-        alert('Archivo eliminado correctamente');
-        location.reload();
-      } else {
-        alert('Error al eliminar archivo');
-      }
-    })
-    .catch(() => alert('Error en la solicitud'));
-  }
+      fetch(`/eliminar_archivo/${id}/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: formData
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Archivo eliminado',
+            timer: 2000,
+            showConfirmButton: false
+          });
+          setTimeout(() => location.reload(), 2000);
+        } else {
+          Swal.fire('Error', 'No se pudo eliminar el archivo', 'error');
+        }
+      })
+      .catch(() => Swal.fire('Error', 'Error en la solicitud', 'error'));
+    }
+  });
 }
-
-
-
 
 // Cerrar modal si se hace click fuera
 modalFondo.onclick = cerrarModal;
 </script>
-
 {% endblock %}
-
