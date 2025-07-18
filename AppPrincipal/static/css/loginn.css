@@ -1,149 +1,187 @@
 @font-face {
-    font-family: 'RulerLight';
-    src: url('../TIPOGRAFIA/Ruler Light.ttf') format('truetype');
-}
-@font-face {
-    font-family: 'RulerBold';
-    src: url('../TIPOGRAFIA/Ruler Bold.ttf') format('truetype');
+  font-family: 'RulerLight';
+  src: url('../TIPOGRAFIA/Ruler Light.ttf') format('truetype');
 }
 
+@font-face {
+  font-family: 'RulerBold';
+  src: url('../TIPOGRAFIA/Ruler Bold.ttf') format('truetype');
+}
+
+/* Fondo con texto y línea decorativa */
 body {
-    position: relative;
-    background-color: #f5f5f5;
-    font-family: 'RulerLight', sans-serif;
-    margin: 0;
-    padding: 0;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
+  position: relative;
+  background-color: #f5f5f5;
+  font-family: 'RulerLight', sans-serif;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
 body::before {
-    content: "ING-DOCS";
-    position: absolute;
-    top: 50%;
-    left: 5%; /* cerca del borde izquierdo */
-    transform: translateY(-50%) rotate(-15deg);
-    font-family: 'RulerBold', sans-serif;
-    font-size: 8rem;
-    color: rgba(70, 162, 159, 0.1);
-    user-select: none;
-    pointer-events: none;
-    z-index: 0;
-    white-space: nowrap;
+  content: "ING-DOCS";
+  position: absolute;
+  top: 50%;
+  left: 5%;
+  transform: translateY(-50%) rotate(-15deg);
+  font-family: 'RulerBold', sans-serif;
+  font-size: 8rem;
+  color: rgba(70, 162, 159, 0.1);
+  user-select: none;
+  pointer-events: none;
+  z-index: 0;
+  white-space: nowrap;
 }
 
 body::after {
-    content: "";
-    position: absolute;
-    width: 150%;
-    height: 8px;
-    background: linear-gradient(to right, #46A29F 0%, transparent 90%);
-    opacity: 0.3;
-    border-radius: 4px;
-    left: -25%;
-    top: 25%;
-    transform: rotate(20deg);
-    z-index: 0;
+  content: "";
+  position: absolute;
+  width: 150%;
+  height: 8px;
+  background: linear-gradient(to right, #46A29F 0%, transparent 90%);
+  opacity: 0.3;
+  border-radius: 4px;
+  left: -25%;
+  top: 25%;
+  transform: rotate(20deg);
+  z-index: 0;
 }
 
-body .login-container {
-    position: relative;
-    z-index: 1;
-}
-
-/* Contenedor del login */
+/* Contenedor principal */
 .login-container {
-    background-color: #ffffff;
-    padding: 40px;
-    border-radius: 12px;
-    /* Sombra ligera para no saturar */
-    box-shadow: 0 0 10px rgba(0,0,0,0.05);
-    width: 350px;
-    box-sizing: border-box;
-    text-align: center;
-    z-index: 1;
-    position: relative;
+  position: relative;
+  z-index: 1;
+  background-color: #ffffff;
+  padding: 50px 40px 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 420px;
+  box-sizing: border-box;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.login-container h2 {
-    font-family: 'RulerBold', sans-serif;
-    color: #003366;
-    margin-bottom: 20px;
-    font-size: 24px;
+/* Logo de empresa */
+.login-container .logo {
+  max-width: 180px;
+  margin-bottom: 15px;
 }
 
-.login-container label {
-    display: block;
-    text-align: left;
-    margin: 15px 0 5px;
-    color: #02385F;
-    font-size: 14px;
+/* Texto debajo del logo */
+.login-container .logo-text {
+  font-family: 'RulerBold', sans-serif;
+  color: #003366;
+  font-size: 1.3rem;
+  margin-bottom: 30px;
 }
 
-.login-container input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #cccccc;
-    border-radius: 6px;
-    font-size: 14px;
-    box-sizing: border-box;
+/* Formulario */
+.login-form {
+  width: 100%;
+  font-family: 'RulerLight', sans-serif;
 }
 
-.login-container button {
-    margin-top: 20px;
-    width: 100%;
-    padding: 12px;
-    background-color: #46A29F;
-    border: none;
-    color: white;
-    font-family: 'RulerBold', sans-serif;
-    font-size: 14px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.3s;
+/* Título */
+.login-form h2 {
+  font-family: 'RulerBold', sans-serif;
+  color: #2a4365;
+  margin-bottom: 2rem;
 }
 
-.login-container button:hover {
-    background-color: #39908d;
+/* Grupo de campos */
+.form-group {
+  margin-bottom: 2rem;
+  text-align: left;
 }
 
-.login-container .error {
-    color: red;
-    font-size: 13px;
-    margin-bottom: 10px;
+/* Etiquetas */
+.form-group label {
+  font-family: 'RulerBold', sans-serif;
+  color: #2c5282;
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
 }
 
-.login-container .registro {
-    margin-top: 20px;
-    font-size: 12px;
-    color: #02385F;
+/* Inputs */
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #02385F;
+  border-radius: 6px;
+  font-size: 1rem;
+  outline: none;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+  box-sizing: border-box;
 }
 
-.login-container .registro a {
-    color: #0099cc;
-    text-decoration: none;
+.form-group input:focus {
+  border-color: #2b6cb0;
+  box-shadow: 0 0 6px #63b3ed;
 }
 
-.login-container .registro a:hover {
-    text-decoration: underline;
+/* Botón submit */
+.submit-button {
+  width: 100%;
+  background-color: #3182ce;
+  color: white;
+  font-weight: bold;
+  font-size: 1.1rem;
+  padding: 0.85rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  box-sizing: border-box;
 }
 
-
-/* Asumiendo que el mensaje aparece en un pequeño texto debajo del input */
-.login-container small,
-.login-container .error,
-.login-container .helptext {
-    font-size: 11px; /* más pequeño */
-    color: #666666;  /* color más suave */
-    margin-top: 2px;
+.submit-button:hover {
+  background-color: #2b6cb0;
 }
 
-/* Si el mensaje está dentro del input por placeholder o similar, se puede ajustar también */
-.login-container input:invalid {
-    border-color: #d9534f; /* rojo suave */
+/* Mensaje de error */
+.error-message {
+  color: #d32f2f;
+  background: #fdecea;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  margin-bottom: 20px;
+  box-sizing: border-box;
 }
 
-/* Si hay un mensaje directamente con el atributo title (tooltip) no se puede estilizar
+/* ...mantén lo demás igual... */
+
+.login-form h2 {
+  font-family: 'RulerBold', sans-serif;
+  color: #2a4365;
+  margin-bottom: 2rem;
+  /* Quitar texto "Acceso" en HTML, por lo que este estilo ya no es visible, pero lo dejamos por si usas otro título */
+}
+
+/* Botón submit con borde y color #46A29F */
+.submit-button {
+  width: 100%;
+  background-color: #46A29F;
+  color: white;
+  font-weight: bold;
+  font-size: 1.1rem;
+  padding: 0.85rem;
+  border: 2px solid #46A29F;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+  box-sizing: border-box;
+}
+
+.submit-button:hover {
+  background-color: #39908d;
+  border-color: #39908d;
+}

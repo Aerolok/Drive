@@ -141,82 +141,28 @@ nav ul li a:hover::after {
 /* FOOTER */
 
 footer {
-    background-color: #02385F;
-    color: white;
+    background-color: #02385F; /* color de fondo azul oscuro */
+    padding: 20px 0;
+    text-align: center; /* centra el contenido dentro del footer */
+}
+
+footer .footer-section {
     display: flex;
-    justify-content: space-between;
-    align-items: start;
-    padding: 40px 50px;
-    font-size: 14px;
-    flex-wrap: wrap;
+    justify-content: center; /* centra horizontalmente la imagen */
+    align-items: center;     /* centra verticalmente si hay más contenido */
+    margin-bottom: 10px;
 }
 
-footer img {
-    height: 60px;
-}
-
-.footer-section {
-    flex: 1;
-    min-width: 200px;
-    margin: 10px;
-}
-
-.footer-section h3 {
-    font-family: 'RulerBold', sans-serif;
-    margin-bottom: 15px;
-}
-
-.footer-section p,
-.footer-section a {
-    font-family: 'RulerLight', sans-serif;
-    color: white;
-    text-decoration: none;
-    margin: 5px 0;
-    display: block;
-}
-
-.icono-info {
-    width: 18px;
-    vertical-align: middle;
-    margin-right: 8px;
-}
-
-.social-icons-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px 20px;
-    margin-top: 10px;
-}
-
-.social-icons-grid img {
-    width: 30px;
-    height: 30px;
-    transition: transform 0.2s;
-}
-
-.social-icons-grid img:hover {
-    transform: scale(1.2);
+footer .footer-section img {
+    height: 60px; /* tamaño de la imagen */
+    object-fit: contain;
 }
 
 .copyright {
-    font-family: 'RulerLightItalic', sans-serif;
     text-align: center;
-    padding: 10px;
-    font-size: 12px;
-    background-color: #043b63;
-    color: #f5f5f5;
-}
-
-.btn-icon {
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  color: #007bff;
-  font-size: 1.2em;
-  padding: 5px;
-  margin-right: 5px;
-}
-
-.btn-icon:hover {
-  color: #0056b3;
+    background-color: #02385F;
+    font-size: 14px;
+    color: #fbfafa; /* texto blanco para buen contraste */
+    margin-top: 5px;
+    font-family: 'RulerBold', sans-serif;
 }
