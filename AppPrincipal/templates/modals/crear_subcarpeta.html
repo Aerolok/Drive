@@ -1,0 +1,122 @@
+<div class="modal-header">
+    <h3><i class="fas fa-folder-plus"></i> Crear Subcarpeta</h3>
+    <button type="button" class="modal-close" onclick="cerrarModal()">&times;</button>
+</div>
+
+<form id="form-crear-subcarpeta" method="post">
+    {% csrf_token %}
+    <div class="modal-body">
+        <div class="parent-folder-info">
+            <div class="folder-icon">
+                <i class="fas fa-folder"></i>
+            </div>
+            <div class="folder-details">
+                <h4>{{ carpeta_padre.nombre }}</h4>
+                <p>{{ carpeta_padre.descripcion }}</p>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.nombre.id_for_label }}">
+                <i class="fas fa-tag"></i> Nombre de la Subcarpeta
+            </label>
+            {{ form.nombre }}
+            <small class="form-help">Nombre descriptivo para la subcarpeta</small>
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.descripcion.id_for_label }}">
+                <i class="fas fa-align-left"></i> Descripción
+            </label>
+            {{ form.descripcion }}
+            <small class="form-help">Descripción opcional de la subcarpeta</small>
+        </div>
+
+        <div class="form-group">
+            <div class="checkbox-group">
+                {{ form.publica }}
+                <label for="{{ form.publica.id_for_label }}">
+                    <i class="fas fa-globe"></i> Hacer pública
+                </label>
+            </div>
+            <small class="form-help">Las subcarpetas públicas pueden ser vistas por todos los usuarios</small>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="cerrarModal()">
+            <i class="fas fa-times"></i> Cancelar
+        </button>
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Crear Subcarpeta
+        </button>
+    </div>
+</form>
+
+<script>
+document.getElementById('form-crear-subcarpeta').onsubmit = function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    fetch('{% url "crear_subcarpeta" carpeta_padre.id %}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Subcarpeta creada exitosamente',
+                timer: 2000,
+                showConfirmButton: false
+            });
+            cerrarModal();
+            setTimeout(() => location.reload(), 2000);
+        } else {
+            let errorMsg = 'Error al crear la subcarpeta';
+            if (data.errors) {
+                errorMsg = Object.values(data.errors).flat().join(', ');
+            }
+            Swal.fire('Error', errorMsg, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire('Error', 'Error de conexión', 'error');
+    });
+};
+</script>
+
+<style>
+.parent-folder-info {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 4px solid #007bff;
+}
+
+.folder-icon {
+    font-size: 2rem;
+    color: #007bff;
+    margin-right: 15px;
+}
+
+.folder-details h4 {
+    margin: 0 0 5px 0;
+    color: #333;
+}
+
+.folder-details p {
+    margin: 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+</style>

@@ -1,0 +1,151 @@
+<div class="modal-header">
+    <h3><i class="fas fa-calendar-plus"></i> Crear Nuevo Período Académico</h3>
+    <button type="button" class="modal-close" onclick="cerrarModal()">&times;</button>
+</div>
+
+<form id="form-crear-periodo" method="post">
+    {% csrf_token %}
+    <div class="modal-body">
+        <div class="form-group">
+            <label for="{{ form.nombre.id_for_label }}">
+                <i class="fas fa-tag"></i> Nombre del Período
+            </label>
+            {{ form.nombre }}
+            <small class="form-help">Ej: Primer Semestre, Segundo Semestre</small>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="{{ form.periodo.id_for_label }}">
+                    <i class="fas fa-calendar-week"></i> Período
+                </label>
+                {{ form.periodo }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.año.id_for_label }}">
+                    <i class="fas fa-calendar"></i> Año
+                </label>
+                {{ form.año }}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="{{ form.fecha_inicio.id_for_label }}">
+                    <i class="fas fa-calendar-day"></i> Fecha de Inicio
+                </label>
+                {{ form.fecha_inicio }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.fecha_fin.id_for_label }}">
+                    <i class="fas fa-calendar-day"></i> Fecha de Fin
+                </label>
+                {{ form.fecha_fin }}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="checkbox-group">
+                {{ form.activo }}
+                <label for="{{ form.activo.id_for_label }}">
+                    <i class="fas fa-check-circle"></i> Activar este período
+                </label>
+            </div>
+            <small class="form-help">Si se activa, se desactivarán automáticamente otros períodos</small>
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.descripcion.id_for_label }}">
+                <i class="fas fa-align-left"></i> Descripción (Opcional)
+            </label>
+            {{ form.descripcion }}
+        </div>
+    </div>
+
+    <div class="modal-footer border-0 bg-light p-4 justify-content-end">
+        <button type="submit" class="btn-custom btn-primary-custom">
+            <i class="fas fa-calendar-plus me-2"></i>Crear Período
+        </button>
+    </div>
+</form>
+
+<style>
+/* Botones personalizados */
+.btn-custom {
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary-custom {
+    background: linear-gradient(135deg, #46A29F 0%, #003366 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(70, 162, 159, 0.3);
+}
+
+.btn-primary-custom:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(70, 162, 159, 0.4);
+}
+
+.btn-secondary-custom {
+    background: #f8f9fa;
+    color: #6c757d;
+    border: 2px solid #e9ecef;
+}
+
+.btn-secondary-custom:hover {
+    background: #e9ecef;
+    color: #495057;
+    transform: translateY(-1px);
+}
+</style>
+
+<script>
+document.getElementById('form-crear-periodo').onsubmit = function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    fetch('{% url "crear_periodo" %}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Período creado exitosamente',
+                text: 'Se han creado las carpetas predefinidas automáticamente',
+                timer: 3000,
+                showConfirmButton: false
+            });
+            cerrarModal();
+            setTimeout(() => location.reload(), 3000);
+        } else {
+            let errorMsg = 'Error al crear el período';
+            if (data.errors) {
+                errorMsg = Object.values(data.errors).flat().join(', ');
+            }
+            Swal.fire('Error', errorMsg, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire('Error', 'Error de conexión', 'error');
+    });
+};
+</script>

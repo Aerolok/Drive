@@ -4,3 +4,21 @@ db.sqlite3
 *.log
 *.swp
 .DS_Store
+
+# Media files (uploads)
+media/
+uploads/
+
+# Large files
+*.tm
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.zip
+*.rar
+*.7z
+
+# Files larger than 100MB
+*.iso
+*.dmg

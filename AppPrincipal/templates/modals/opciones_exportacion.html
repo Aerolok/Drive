@@ -1,0 +1,218 @@
+<div class="modal fade" id="opcionesExportacionModal" tabindex="-1" role="dialog" aria-labelledby="opcionesExportacionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header bg-institucional text-white border-0">
+                <h5 class="modal-title d-flex align-items-center" id="opcionesExportacionModalLabel">
+                    <div class="icon-circle bg-white bg-opacity-20 me-3">
+                        <i class="fas fa-download"></i>
+                    </div>
+                    Exportar Período Académico
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body p-4">
+                <!-- Información del período -->
+                <div class="alert alert-info border-0 mb-4">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-info-circle me-3 fs-4"></i>
+                        <div>
+                            <h6 class="mb-1">{{ periodo.nombre }} - {{ periodo.año }}</h6>
+                            <small class="text-muted">
+                                {{ total_carpetas }} carpetas • {{ total_archivos }} archivos
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Opciones de exportación -->
+                <div class="row g-4">
+                    <!-- Opción Local -->
+                    <div class="col-md-6">
+                        <div class="export-option-card h-100 p-4 border rounded-3 text-center position-relative">
+                            <div class="export-icon mb-3">
+                                <i class="fas fa-download text-primary" style="font-size: 3rem;"></i>
+                            </div>
+                            <h5 class="mb-3">Descargar Local</h5>
+                            <p class="text-muted mb-4">
+                                Descarga todas las carpetas y archivos como un archivo ZIP a tu computadora.
+                            </p>
+                            <ul class="list-unstyled text-start mb-4">
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Descarga inmediata
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Incluye todas las subcarpetas
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Formato ZIP comprimido
+                                </li>
+                            </ul>
+                            <button type="button" class="btn btn-primary w-100" onclick="exportarLocal({{ periodo.id }})">
+                                <i class="fas fa-download me-2"></i>
+                                Descargar ZIP
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Opción Google Drive -->
+                    <div class="col-md-6">
+                        <div class="export-option-card h-100 p-4 border rounded-3 text-center position-relative">
+                            <div class="export-icon mb-3">
+                                <i class="fab fa-google-drive text-success" style="font-size: 3rem;"></i>
+                            </div>
+                            <h5 class="mb-3">Exportar a Google Drive</h5>
+                            <p class="text-muted mb-4">
+                                Sube todas las carpetas y archivos directamente a tu Google Drive.
+                            </p>
+                            <ul class="list-unstyled text-start mb-4">
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Acceso desde cualquier lugar
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Sincronización automática
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Compartir fácilmente
+                                </li>
+                            </ul>
+                            <button type="button" class="btn btn-success w-100" onclick="exportarGoogleDrive({{ periodo.id }})">
+                                <i class="fab fa-google-drive me-2"></i>
+                                Exportar a Drive
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vista previa de carpetas -->
+                <div class="mt-4">
+                    <h6 class="mb-3">
+                        <i class="fas fa-folder me-2"></i>
+                        Carpetas a exportar:
+                    </h6>
+                    <div class="folder-preview bg-light rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                        {% for carpeta in carpetas_principales %}
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-folder text-warning me-2"></i>
+                            <span class="fw-medium">{{ carpeta.nombre }}</span>
+                            <small class="text-muted ms-auto">
+                                {{ carpeta.subcarpetas.count }} subcarpetas • {{ carpeta.archivos.count }} archivos
+                            </small>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer border-0 bg-light">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.export-option-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.export-option-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+    border-color: var(--bs-primary) !important;
+}
+
+.export-icon {
+    transition: transform 0.3s ease;
+}
+
+.export-option-card:hover .export-icon {
+    transform: scale(1.1);
+}
+
+.folder-preview {
+    border: 1px solid #dee2e6;
+}
+</style>
+
+<script>
+function exportarLocal(periodoId) {
+    // Mostrar indicador de carga
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Preparando descarga...';
+    btn.disabled = true;
+    
+    // Iniciar descarga
+    window.open(`/exportar_periodo_zip/${periodoId}/`, '_blank');
+    
+    // Restaurar botón después de un momento
+    setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        $('#opcionesExportacionModal').modal('hide');
+    }, 2000);
+}
+
+function exportarGoogleDrive(periodoId) {
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Exportando...';
+    btn.disabled = true;
+    
+    fetch(`/exportar_google_drive/${periodoId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Mostrar mensaje de éxito
+            Swal.fire({
+                icon: 'success',
+                title: '¡Exportación exitosa!',
+                text: data.message,
+                confirmButtonText: 'Ver en Drive',
+                showCancelButton: true,
+                cancelButtonText: 'Cerrar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.open(data.drive_url, '_blank');
+                }
+            });
+            $('#opcionesExportacionModal').modal('hide');
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudo exportar a Google Drive. Inténtalo de nuevo.',
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Ocurrió un error durante la exportación.',
+        });
+    })
+    .finally(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
+}
+</script>

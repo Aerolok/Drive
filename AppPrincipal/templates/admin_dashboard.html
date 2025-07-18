@@ -2,97 +2,367 @@
 
 {% block content %}
 <div class="admin-panel">
+  <!-- Header del Dashboard -->
   <div class="admin-header">
-    <h1>Bienvenido, administrador {{ request.user.username }}</h1>
+    <div class="header-content">
+      <h1><i class="fas fa-tachometer-alt"></i> Panel de Administración</h1>
+      <p class="welcome-text">Bienvenido, <strong>{{ request.user.username }}</strong></p>
+      {% if periodo_activo %}
+        <div class="periodo-activo">
+          <i class="fas fa-calendar-check"></i>
+          <span>Período Activo: {{ periodo_activo.nombre }} {{ periodo_activo.año }}</span>
+        </div>
+      {% endif %}
+    </div>
+    <div class="header-actions">
+      <!-- Botón movido a la sección de períodos académicos -->
+    </div>
   </div>
 
-  <hr class="linea-turquesa">
-
-  <section class="usuarios-section">
-    <div class="section-header">
-      <h2>Gestión de Usuarios</h2>
-      <button id="btnCrearUsuario" class="btn-principal">+ Crear usuario</button>
+  <!-- Dashboard de Estadísticas -->
+  <section class="dashboard-stats">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ total_usuarios }}</h3>
+          <p>Usuarios Activos</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-folder"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ total_carpetas }}</h3>
+          <p>Carpetas Totales</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-file"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ total_archivos }}</h3>
+          <p>Archivos Almacenados</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-calendar-alt"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ periodos.count }}</h3>
+          <p>Períodos Académicos</p>
+        </div>
+      </div>
     </div>
-    <table class="tabla">
-      <thead>
-        <tr>
-          <th>Usuario</th>
-          <th>Email</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for u in usuarios %}
-          {% if not u.is_staff %}
-          <tr>
-            <td>{{ u.username }}</td>
-            <td>{{ u.email }}</td>
-            <td>
-              <button class="btn-accion btn-editar" data-id="{{ u.id }}">Editar</button>
-              <button class="btn-accion btn-eliminar" data-id="{{ u.id }}">Eliminar</button>
-            </td>
-          </tr>
-          {% endif %}
-        {% endfor %}
-      </tbody>
-    </table>
   </section>
 
   <hr class="linea-turquesa">
 
-  <section class="carpetas-section">
-    <div class="section-header">
-      <h2>Carpetas y Archivos</h2>
-      <button id="btnCrearCarpeta" class="btn-principal">+ Crear carpeta</button>
-    </div>
+  <!-- Navegación por Pestañas -->
+  <div class="tab-navigation">
+    <button class="tab-btn active" data-tab="usuarios">
+      <i class="fas fa-users"></i> Gestión de Usuarios
+    </button>
+    <button class="tab-btn" data-tab="periodos">
+      <i class="fas fa-calendar-alt"></i> Períodos Académicos
+    </button>
+    <button class="tab-btn" data-tab="carpetas">
+      <i class="fas fa-folder-open"></i> Carpetas y Archivos
+    </button>
+  </div>
 
-    {% for c in carpetas %}
-    <div class="carpeta-container">
-      <div class="carpeta-info">
-        <h3>{{ c.nombre }}</h3>
-        <p><strong>Propietario:</strong> {{ c.usuario.username }}</p>
-        <p>{{ c.descripcion }}</p>
+  <!-- Contenido de Pestañas -->
+  <div class="tab-content">
+    
+    <!-- Pestaña de Usuarios -->
+    <div id="usuarios-tab" class="tab-pane active">
+      <div class="section-header">
+        <h2><i class="fas fa-users"></i> Gestión de Usuarios</h2>
+        <div class="header-controls">
+          <div class="search-box">
+            <input type="text" id="searchUsuarios" placeholder="Buscar usuarios...">
+            <i class="fas fa-search"></i>
+          </div>
+          <button id="btnCrearUsuario" class="btn-principal">
+            <i class="fas fa-user-plus"></i> Crear Usuario
+          </button>
+        </div>
       </div>
-
-      <div class="carpeta-archivos">
-        <h4>Archivos:</h4>
-        {% if c.archivos.all %}
-        <table class="tabla">
+      
+      <div class="table-container">
+        <table class="tabla modern-table">
           <thead>
             <tr>
-              <th>Archivo</th>
-              <th>Usuario</th>
-              <th>Fecha Subida</th>
-              <th>Ver</th>
-              <th>Descargar</th>
-              <th>Eliminar</th>
+              <th><i class="fas fa-user"></i> Usuario</th>
+              <th><i class="fas fa-envelope"></i> Email</th>
+              <th><i class="fas fa-calendar"></i> Fecha Registro</th>
+              <th><i class="fas fa-folder"></i> Carpetas</th>
+              <th><i class="fas fa-file"></i> Archivos</th>
+              <th><i class="fas fa-cogs"></i> Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {% for archivo in c.archivos.all %}
-            <tr>
-              <td>{{ archivo.nombre }}</td>
-              <td>{{ archivo.usuario.username }}</td>
-              <td>{{ archivo.fecha_subida|date:"d/m/Y H:i" }}</td>
-              <td><a href="{{ archivo.archivo.url }}" target="_blank">Ver</a></td>
-              <td><a href="{{ archivo.archivo.url }}" download>Descargar</a></td>
-              <td><button class="btn-accion" onclick="eliminarArchivoAdmin({{ archivo.id }})">Eliminar</button></td>
-            </tr>
+            {% for u in usuarios %}
+              {% if not u.is_staff %}
+              <tr>
+                <td>
+                  <div class="user-info">
+                    <div class="user-avatar">{{ u.username|first|upper }}</div>
+                    <span>{{ u.username }}</span>
+                  </div>
+                </td>
+                <td>{{ u.email }}</td>
+                <td>{{ u.date_joined|date:"d/m/Y" }}</td>
+                <td>
+                  <span class="badge">{{ u.carpeta_set.count }}</span>
+                </td>
+                <td>
+                  <span class="badge">{{ u.archivo_set.count }}</span>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <button class="btn-accion btn-editar" data-id="{{ u.id }}" title="Editar">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-accion btn-eliminar" data-id="{{ u.id }}" title="Eliminar">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              {% endif %}
             {% endfor %}
           </tbody>
         </table>
-        {% else %}
-        <p class="mensaje-vacio">No hay archivos en esta carpeta.</p>
-        {% endif %}
-      </div>
-
-      <div class="carpeta-acciones">
-        <button class="btn-accion btn-editar-carpeta" data-id="{{ c.id }}">Editar Carpeta</button>
-        <button class="btn-accion btn-eliminar-carpeta" data-id="{{ c.id }}">Eliminar Carpeta</button>
       </div>
     </div>
-    {% endfor %}
-  </section>
+
+    <!-- Pestaña de Períodos Académicos -->
+    <div id="periodos-tab" class="tab-pane">
+      <div class="section-header">
+        <h2><i class="fas fa-calendar-alt"></i> Períodos Académicos</h2>
+        <div class="header-controls">
+          <button id="btnCrearPeriodo" class="btn-principal">
+            <i class="fas fa-plus"></i> Nuevo Período
+          </button>
+        </div>
+      </div>
+
+      <div class="periodos-grid">
+        {% for periodo in periodos %}
+        <div class="periodo-card {% if periodo.activo %}periodo-activo{% endif %}">
+          <div class="periodo-header">
+            <h3>{{ periodo.nombre }}</h3>
+            {% if periodo.activo %}
+              <span class="badge badge-success">Activo</span>
+            {% else %}
+              <span class="badge badge-secondary">Inactivo</span>
+            {% endif %}
+          </div>
+          <div class="periodo-info">
+            <p><i class="fas fa-calendar"></i> Año: {{ periodo.año }}</p>
+            <p><i class="fas fa-calendar-week"></i> Período: {{ periodo.periodo }}</p>
+            <p><i class="fas fa-calendar-day"></i> {{ periodo.fecha_inicio|date:"d/m/Y" }} - {{ periodo.fecha_fin|date:"d/m/Y" }}</p>
+          </div>
+          <div class="periodo-actions">
+            {% if not periodo.activo %}
+              <button class="btn-accion btn-activar" data-id="{{ periodo.id }}" title="Activar">
+                <i class="fas fa-play"></i> Activar
+              </button>
+            {% endif %}
+            <button class="btn-accion btn-exportar" data-id="{{ periodo.id }}" title="Exportar">
+              <i class="fas fa-download"></i> Exportar
+            </button>
+            <button class="btn-accion btn-eliminar" data-id="{{ periodo.id }}" title="Eliminar">
+              <i class="fas fa-trash"></i> Eliminar
+            </button>
+          </div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+          <i class="fas fa-calendar-times"></i>
+          <h3>No hay períodos académicos</h3>
+          <p>Crea el primer período académico para comenzar</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Pestaña de Carpetas -->
+    <div id="carpetas-tab" class="tab-pane">
+      <div class="section-header">
+        <h2><i class="fas fa-folder-open"></i> Carpetas y Archivos</h2>
+        <div class="header-controls">
+          <div class="view-controls">
+            <button id="viewGrid" class="view-btn active" title="Vista de Cuadrícula">
+              <i class="fas fa-th"></i>
+            </button>
+            <button id="viewList" class="view-btn" title="Vista de Lista">
+              <i class="fas fa-list"></i>
+            </button>
+          </div>
+          <div class="search-box">
+            <input type="text" id="searchCarpetas" placeholder="Buscar carpetas...">
+            <i class="fas fa-search"></i>
+          </div>
+          <button id="btnCrearCarpeta" class="btn-principal">
+            <i class="fas fa-folder-plus"></i> Crear Carpeta
+          </button>
+        </div>
+      </div>
+
+      <!-- Vista de Cuadrícula -->
+      <div id="grid-view" class="folders-grid">
+        {% for c in carpetas %}
+        <div class="folder-card" data-folder-id="{{ c.id }}">
+          <div class="folder-header">
+            <div class="folder-icon">
+              <i class="fas fa-folder"></i>
+            </div>
+            <div class="folder-menu">
+              <button class="menu-btn" onclick="toggleFolderMenu({{ c.id }})">
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+              <div class="folder-menu-dropdown" id="menu-{{ c.id }}">
+                <a href="#" class="menu-item" onclick="editarCarpeta({{ c.id }})">
+                  <i class="fas fa-edit"></i> Editar
+                </a>
+                <a href="#" class="menu-item danger" onclick="eliminarCarpeta({{ c.id }})">
+                  <i class="fas fa-trash"></i> Eliminar
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="folder-content">
+            <h3>{{ c.nombre }}</h3>
+            <p class="folder-owner">
+              <i class="fas fa-user"></i> {{ c.usuario.username }}
+            </p>
+            <p class="folder-description">{{ c.descripcion|truncatechars:50 }}</p>
+            <div class="folder-stats">
+              <span class="file-count">
+                <i class="fas fa-file"></i> {{ c.archivos.count }} archivo{{ c.archivos.count|pluralize }}
+              </span>
+              {% if c.publica %}
+                <span class="public-badge">
+                  <i class="fas fa-globe"></i> Pública
+                </span>
+              {% else %}
+                <span class="private-badge">
+                  <i class="fas fa-lock"></i> Privada
+                </span>
+              {% endif %}
+            </div>
+          </div>
+          <div class="folder-files">
+            {% if c.archivos.all %}
+              <div class="files-preview">
+                {% for archivo in c.archivos.all|slice:":3" %}
+                  <div class="file-preview" title="{{ archivo.nombre }}">
+                    <i class="fas fa-file-alt"></i>
+                  </div>
+                {% endfor %}
+                {% if c.archivos.count > 3 %}
+                  <div class="more-files">+{{ c.archivos.count|add:"-3" }}</div>
+                {% endif %}
+              </div>
+            {% else %}
+              <p class="empty-folder">Carpeta vacía</p>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Vista de Lista -->
+      <div id="list-view" class="folders-list" style="display: none;">
+        {% for c in carpetas %}
+        <div class="folder-list-item">
+          <div class="folder-info">
+            <div class="folder-icon-list">
+              <i class="fas fa-folder"></i>
+            </div>
+            <div class="folder-details">
+              <h3>{{ c.nombre }}</h3>
+              <p><strong>Propietario:</strong> {{ c.usuario.username }}</p>
+              <p>{{ c.descripcion }}</p>
+              <div class="folder-meta">
+                <span>{{ c.archivos.count }} archivo{{ c.archivos.count|pluralize }}</span>
+                {% if c.publica %}
+                  <span class="public-badge"><i class="fas fa-globe"></i> Pública</span>
+                {% else %}
+                  <span class="private-badge"><i class="fas fa-lock"></i> Privada</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="folder-files-list">
+            {% if c.archivos.all %}
+            <div class="files-table-container">
+              <table class="files-table">
+                <thead>
+                  <tr>
+                    <th>Archivo</th>
+                    <th>Usuario</th>
+                    <th>Fecha</th>
+                    <th>Tamaño</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for archivo in c.archivos.all %}
+                  <tr>
+                    <td>
+                      <div class="file-info">
+                        <i class="fas fa-file-alt"></i>
+                        <span>{{ archivo.nombre }}</span>
+                      </div>
+                    </td>
+                    <td>{{ archivo.usuario.username }}</td>
+                    <td>{{ archivo.fecha_subida|date:"d/m/Y H:i" }}</td>
+                    <td>{{ archivo.archivo.size|filesizeformat }}</td>
+                    <td>
+                      <div class="file-actions">
+                        <a href="{{ archivo.archivo.url }}" target="_blank" class="btn-file-action" title="Ver">
+                          <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{{ archivo.archivo.url }}" download class="btn-file-action" title="Descargar">
+                          <i class="fas fa-download"></i>
+                        </a>
+                        <button class="btn-file-action danger" onclick="eliminarArchivoAdmin({{ archivo.id }})" title="Eliminar">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+            <p class="mensaje-vacio">No hay archivos en esta carpeta.</p>
+            {% endif %}
+          </div>
+
+          <div class="folder-actions">
+            <button class="btn-accion btn-editar-carpeta" data-id="{{ c.id }}">
+              <i class="fas fa-edit"></i> Editar
+            </button>
+            <button class="btn-accion btn-eliminar-carpeta" data-id="{{ c.id }}">
+              <i class="fas fa-trash"></i> Eliminar
+            </button>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
 
   <!-- Ventanas modales flotantes -->
   <div id="modalFondo" class="modal-fondo"></div>
@@ -105,11 +375,108 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+// Variables globales
 const modalFondo = document.getElementById('modalFondo');
 const modalUsuario = document.getElementById('modalUsuario');
 const modalCarpeta = document.getElementById('modalCarpeta');
 const modalArchivo = document.getElementById('modalArchivo');
 
+// Funcionalidad de pestañas
+document.addEventListener('DOMContentLoaded', function() {
+  // Inicializar pestañas
+  const tabButtons = document.querySelectorAll('.tab-btn');
+  const tabPanes = document.querySelectorAll('.tab-pane');
+
+  tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const targetTab = button.getAttribute('data-tab');
+      
+      // Remover clase active de todos los botones y paneles
+      tabButtons.forEach(btn => btn.classList.remove('active'));
+      tabPanes.forEach(pane => pane.classList.remove('active'));
+      
+      // Agregar clase active al botón y panel seleccionado
+      button.classList.add('active');
+      document.getElementById(targetTab + '-tab').classList.add('active');
+    });
+  });
+
+  // Funcionalidad de vista de carpetas
+  const viewGrid = document.getElementById('viewGrid');
+  const viewList = document.getElementById('viewList');
+  const gridView = document.getElementById('grid-view');
+  const listView = document.getElementById('list-view');
+
+  if (viewGrid && viewList) {
+    viewGrid.addEventListener('click', () => {
+      viewGrid.classList.add('active');
+      viewList.classList.remove('active');
+      gridView.style.display = 'grid';
+      listView.style.display = 'none';
+    });
+
+    viewList.addEventListener('click', () => {
+      viewList.classList.add('active');
+      viewGrid.classList.remove('active');
+      gridView.style.display = 'none';
+      listView.style.display = 'block';
+    });
+  }
+
+  // Funcionalidad de búsqueda
+  const searchUsuarios = document.getElementById('searchUsuarios');
+  const searchCarpetas = document.getElementById('searchCarpetas');
+
+  if (searchUsuarios) {
+    searchUsuarios.addEventListener('input', function() {
+      const filter = this.value.toLowerCase();
+      const rows = document.querySelectorAll('#usuarios-tab tbody tr');
+      
+      rows.forEach(row => {
+        const username = row.querySelector('td:first-child').textContent.toLowerCase();
+        const email = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+        
+        if (username.includes(filter) || email.includes(filter)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    });
+  }
+
+  if (searchCarpetas) {
+    searchCarpetas.addEventListener('input', function() {
+      const filter = this.value.toLowerCase();
+      const folderCards = document.querySelectorAll('.folder-card');
+      const folderListItems = document.querySelectorAll('.folder-list-item');
+      
+      folderCards.forEach(card => {
+        const folderName = card.querySelector('h3').textContent.toLowerCase();
+        const folderOwner = card.querySelector('.folder-owner').textContent.toLowerCase();
+        
+        if (folderName.includes(filter) || folderOwner.includes(filter)) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      folderListItems.forEach(item => {
+        const folderName = item.querySelector('h3').textContent.toLowerCase();
+        const folderOwner = item.querySelector('p').textContent.toLowerCase();
+        
+        if (folderName.includes(filter) || folderOwner.includes(filter)) {
+          item.style.display = '';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    });
+  }
+});
+
+// Funciones de modal
 function abrirModal(modal, url) {
   fetch(url)
   .then(res => res.text())
@@ -163,90 +530,273 @@ function cerrarModal() {
   modalArchivo.innerHTML = '';
 }
 
-// Crear usuario
-document.getElementById('btnCrearUsuario').onclick = () => abrirModal(modalUsuario, "{% url 'crear_usuario' %}");
+// Funciones de menú de carpetas
+function toggleFolderMenu(folderId) {
+  const menu = document.getElementById('menu-' + folderId);
+  const allMenus = document.querySelectorAll('.folder-menu-dropdown');
+  
+  // Cerrar todos los otros menús
+  allMenus.forEach(m => {
+    if (m !== menu) {
+      m.style.display = 'none';
+    }
+  });
+  
+  // Toggle del menú actual
+  menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+}
 
-// Editar usuario
-document.querySelectorAll('.btn-editar').forEach(btn => {
-  btn.onclick = () => abrirModal(modalUsuario, `/editar_usuario/${btn.dataset.id}/`);
-});
-
-// Eliminar usuario
-document.querySelectorAll('.btn-eliminar').forEach(btn => {
-  btn.onclick = () => {
-    Swal.fire({
-      title: '¿Estás seguro?',
-      text: "Esta acción eliminará al usuario",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar'
-    }).then(result => {
-      if(result.isConfirmed){
-        fetch(`/eliminar_usuario/${btn.dataset.id}/`, {
-          method: 'POST',
-          headers: {'X-CSRFToken': '{{ csrf_token }}'},
-        })
-        .then(r => r.json())
-        .then(data => {
-          if(data.success){
-            Swal.fire({
-              icon: 'success',
-              title: 'Usuario eliminado',
-              timer: 2000,
-              showConfirmButton: false
-            });
-            setTimeout(() => location.reload(), 2000);
-          } else {
-            Swal.fire('Error', 'No se pudo eliminar el usuario', 'error');
-          }
-        });
-      }
+// Cerrar menús al hacer click fuera
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.folder-menu')) {
+    document.querySelectorAll('.folder-menu-dropdown').forEach(menu => {
+      menu.style.display = 'none';
     });
   }
 });
 
-// Crear carpeta
-document.getElementById('btnCrearCarpeta').onclick = () => abrirModal(modalCarpeta, "{% url 'crear_carpeta' %}");
+// Funciones de gestión de carpetas
+function editarCarpeta(id) {
+  abrirModal(modalCarpeta, `/editar_carpeta/${id}/`);
+}
 
-// Editar carpeta
-document.querySelectorAll('.btn-editar-carpeta').forEach(btn => {
-  btn.onclick = () => abrirModal(modalCarpeta, `/editar_carpeta/${btn.dataset.id}/`);
-});
+function eliminarCarpeta(id) {
+  Swal.fire({
+    title: '¿Eliminar carpeta?',
+    text: "Esta acción no se puede deshacer",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar'
+  }).then(result => {
+    if(result.isConfirmed){
+      fetch(`/eliminar_carpeta/${id}/`, {
+        method: 'POST',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+      })
+      .then(r => r.json())
+      .then(data => {
+        if(data.success){
+          Swal.fire({
+            icon: 'success',
+            title: 'Carpeta eliminada',
+            timer: 2000,
+            showConfirmButton: false
+          });
+          setTimeout(() => location.reload(), 2000);
+        } else {
+          Swal.fire('Error', 'No se pudo eliminar la carpeta', 'error');
+        }
+      });
+    }
+  });
+}
 
-// Eliminar carpeta
-document.querySelectorAll('.btn-eliminar-carpeta').forEach(btn => {
-  btn.onclick = () => {
-    Swal.fire({
-      title: '¿Eliminar carpeta?',
-      text: "Esta acción no se puede deshacer",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar'
-    }).then(result => {
-      if(result.isConfirmed){
-        fetch(`/eliminar_carpeta/${btn.dataset.id}/`, {
-          method: 'POST',
-          headers: {'X-CSRFToken': '{{ csrf_token }}'},
-        })
-        .then(r => r.json())
-        .then(data => {
-          if(data.success){
-            Swal.fire({
-              icon: 'success',
-              title: 'Carpeta eliminada',
-              timer: 2000,
-              showConfirmButton: false
+// Event listeners para botones
+document.addEventListener('DOMContentLoaded', function() {
+  // Crear usuario
+  const btnCrearUsuario = document.getElementById('btnCrearUsuario');
+  if (btnCrearUsuario) {
+    btnCrearUsuario.onclick = () => abrirModal(modalUsuario, "{% url 'crear_usuario' %}");
+  }
+
+  // Crear período
+  const btnCrearPeriodo = document.getElementById('btnCrearPeriodo');
+  if (btnCrearPeriodo) {
+    btnCrearPeriodo.onclick = () => abrirModal(modalCarpeta, "/crear_periodo/");
+  }
+
+  // Activar período
+  document.querySelectorAll('.btn-activar').forEach(btn => {
+    btn.onclick = () => {
+      Swal.fire({
+        title: '¿Activar período?',
+        text: "Esto desactivará el período actual",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, activar',
+        cancelButtonText: 'Cancelar'
+      }).then(result => {
+        if(result.isConfirmed){
+          fetch(`/activar_periodo/${btn.dataset.id}/`, {
+            method: 'POST',
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          })
+          .then(r => r.json())
+          .then(data => {
+            if(data.success){
+              Swal.fire({
+                icon: 'success',
+                title: 'Período activado',
+                timer: 2000,
+                showConfirmButton: false
+              });
+              setTimeout(() => location.reload(), 2000);
+            } else {
+              Swal.fire('Error', 'No se pudo activar el período', 'error');
+            }
+          });
+        }
+      });
+    }
+  });
+
+  // Exportar período
+  document.querySelectorAll('.btn-exportar').forEach(btn => {
+    btn.onclick = () => {
+      const periodoId = btn.dataset.id;
+      
+      // Mostrar opciones de exportación con SweetAlert
+      Swal.fire({
+        title: 'Opciones de Exportación',
+        html: `
+          <div class="text-center">
+            <p class="mb-4">Selecciona cómo deseas exportar el período académico:</p>
+            <div class="d-grid gap-3">
+              <button class="btn btn-primary btn-lg" onclick="exportarLocal(${periodoId})">
+                <i class="fas fa-download me-2"></i>
+                Descargar ZIP Local
+              </button>
+              <button class="btn btn-success btn-lg" onclick="exportarGoogleDrive(${periodoId})">
+                <i class="fab fa-google-drive me-2"></i>
+                Abrir Google Drive
+              </button>
+            </div>
+          </div>
+        `,
+        showConfirmButton: false,
+        showCancelButton: true,
+        cancelButtonText: 'Cancelar',
+        width: '500px'
+      });
+    }
+  });
+
+  // Editar usuario
+  document.querySelectorAll('.btn-editar').forEach(btn => {
+    btn.onclick = () => abrirModal(modalUsuario, `/editar_usuario/${btn.dataset.id}/`);
+  });
+
+  // Eliminar usuario
+  document.querySelectorAll('.btn-eliminar').forEach(btn => {
+    // Verificar si el botón está en la sección de usuarios
+    const isUserButton = btn.closest('#usuarios-tab');
+    if (isUserButton) {
+      btn.onclick = () => {
+        Swal.fire({
+          title: '¿Estás seguro?',
+          text: "Esta acción eliminará al usuario",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Sí, eliminar',
+          cancelButtonText: 'Cancelar'
+        }).then(result => {
+          if(result.isConfirmed){
+            fetch(`/eliminar_usuario/${btn.dataset.id}/`, {
+              method: 'POST',
+              headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            })
+            .then(r => r.json())
+            .then(data => {
+              if(data.success){
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Usuario eliminado',
+                  timer: 2000,
+                  showConfirmButton: false
+                });
+                setTimeout(() => location.reload(), 2000);
+              } else {
+                Swal.fire('Error', 'No se pudo eliminar el usuario', 'error');
+              }
             });
-            setTimeout(() => location.reload(), 2000);
-          } else {
-            Swal.fire('Error', 'No se pudo eliminar la carpeta', 'error');
           }
         });
       }
-    });
+    }
+    
+    // Verificar si el botón está en la sección de períodos
+    const isPeriodButton = btn.closest('#periodos-tab');
+    if (isPeriodButton) {
+      btn.onclick = () => {
+        Swal.fire({
+          title: '¿Eliminar período académico?',
+          text: "Esta acción eliminará el período y todas sus carpetas asociadas",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Sí, eliminar',
+          cancelButtonText: 'Cancelar'
+        }).then(result => {
+          if(result.isConfirmed){
+            fetch(`/eliminar_periodo/${btn.dataset.id}/`, {
+              method: 'POST',
+              headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            })
+            .then(r => r.json())
+            .then(data => {
+              if(data.success){
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Período eliminado',
+                  timer: 2000,
+                  showConfirmButton: false
+                });
+                setTimeout(() => location.reload(), 2000);
+              } else {
+                Swal.fire('Error', 'No se pudo eliminar el período', 'error');
+              }
+            });
+          }
+        });
+      }
+    }
+  });
+
+  // Crear carpeta
+  const btnCrearCarpeta = document.getElementById('btnCrearCarpeta');
+  if (btnCrearCarpeta) {
+    btnCrearCarpeta.onclick = () => abrirModal(modalCarpeta, "{% url 'crear_carpeta' %}");
   }
+
+  // Editar carpeta
+  document.querySelectorAll('.btn-editar-carpeta').forEach(btn => {
+    btn.onclick = () => abrirModal(modalCarpeta, `/editar_carpeta/${btn.dataset.id}/`);
+  });
+
+  // Eliminar carpeta
+  document.querySelectorAll('.btn-eliminar-carpeta').forEach(btn => {
+    btn.onclick = () => {
+      Swal.fire({
+        title: '¿Eliminar carpeta?',
+        text: "Esta acción no se puede deshacer",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+      }).then(result => {
+        if(result.isConfirmed){
+          fetch(`/eliminar_carpeta/${btn.dataset.id}/`, {
+            method: 'POST',
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          })
+          .then(r => r.json())
+          .then(data => {
+            if(data.success){
+              Swal.fire({
+                icon: 'success',
+                title: 'Carpeta eliminada',
+                timer: 2000,
+                showConfirmButton: false
+              });
+              setTimeout(() => location.reload(), 2000);
+            } else {
+              Swal.fire('Error', 'No se pudo eliminar la carpeta', 'error');
+            }
+          });
+        }
+      });
+    }
+  });
 });
 
 function eliminarArchivoAdmin(id) {
@@ -284,6 +834,76 @@ function eliminarArchivoAdmin(id) {
         }
       })
       .catch(() => Swal.fire('Error', 'Error en la solicitud', 'error'));
+    }
+  });
+}
+
+// Funciones de exportación
+function exportarLocal(periodoId) {
+  Swal.close(); // Cerrar el modal de opciones
+  
+  // Mostrar mensaje de preparación
+  Swal.fire({
+    title: 'Preparando descarga...',
+    text: 'Se está generando el archivo ZIP',
+    icon: 'info',
+    allowOutsideClick: false,
+    showConfirmButton: false,
+    timer: 2000
+  });
+  
+  // Iniciar descarga
+  setTimeout(() => {
+    window.open(`/exportar_periodo_zip/${periodoId}/`, '_blank');
+    Swal.fire({
+      icon: 'success',
+      title: 'Descarga iniciada',
+      text: 'El archivo se está descargando...',
+      timer: 3000,
+      showConfirmButton: false
+    });
+  }, 2000);
+}
+
+function exportarGoogleDrive(periodoId) {
+  Swal.close(); // Cerrar el modal de opciones
+  
+  // Mostrar información sobre Google Drive
+  Swal.fire({
+    title: 'Abrir Google Drive',
+    html: `
+      <div class="text-center">
+        <i class="fab fa-google-drive text-success mb-3" style="font-size: 4rem;"></i>
+        <p class="mb-3">Se abrirá Google Drive en una nueva pestaña.</p>
+        <p class="text-muted small">
+          Puedes crear una carpeta para el período académico y subir los archivos manualmente.
+        </p>
+      </div>
+    `,
+    showCancelButton: true,
+    confirmButtonText: 'Abrir Google Drive',
+    cancelButtonText: 'Cancelar',
+    confirmButtonColor: '#28a745'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Abrir Google Drive en nueva pestaña
+      window.open('https://drive.google.com/drive/my-drive', '_blank');
+      
+      // Mostrar mensaje adicional
+      Swal.fire({
+        icon: 'info',
+        title: 'Google Drive abierto',
+        html: `
+          <p>Google Drive se ha abierto en una nueva pestaña.</p>
+          <p class="text-muted small">
+            Puedes crear una carpeta y subir los archivos del período académico.
+            <br><br>
+            <strong>Tip:</strong> También puedes usar la opción "Descargar ZIP Local" 
+            y luego subir el archivo a Google Drive.
+          </p>
+        `,
+        confirmButtonText: 'Entendido'
+      });
     }
   });
 }

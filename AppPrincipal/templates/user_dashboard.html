@@ -3,63 +3,144 @@
 {% block content %}
 <div class="admin-panel">
 
-  <h1 class="titulo-principal">Bienvenido, Usuario {{ request.user.username }}</h1>
+  <h1 class="titulo-principal">
+    <i class="fas fa-user-circle"></i> 
+    Bienvenido, {{ request.user.first_name|default:request.user.username }}
+  </h1>
 
   <hr class="linea-turquesa">
 
+  <!-- Información de los períodos activos -->
+  {% if periodos_activos %}
+  <div class="alert alert-info mb-4">
+    <i class="fas fa-calendar-alt"></i>
+    <strong>Períodos Académicos Activos:</strong>
+    <div class="periodos-activos-lista">
+      {% for periodo in periodos_activos %}
+        <div class="periodo-activo-item">
+          <span class="periodo-nombre">{{ periodo.nombre }} - {{ periodo.año }}</span>
+          <small class="periodo-admin">(Admin: {{ periodo.administrador.first_name|default:periodo.administrador.username }})</small>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% else %}
+  <div class="alert alert-warning mb-4">
+    <i class="fas fa-exclamation-triangle"></i>
+    <strong>No hay períodos académicos activos.</strong> Contacta al administrador.
+  </div>
+  {% endif %}
+
+  <!-- Sección de Carpetas -->
   <section class="carpetas-section">
     <div class="section-header">
-      <h2 class="titulo-seccion">Carpetas y Archivos</h2>
+      <h2 class="titulo-seccion">
+        <i class="fas fa-folder-open"></i> 
+        Carpetas Disponibles
+      </h2>
     </div>
 
-    <button type="button" class="btn btn-subir-general">Subir Archivo</button>
-
-    <table class="tabla-estilo">
-      <thead>
-        <tr>
-          <th>Carpeta</th>
-          <th>Archivo</th>
-          <th>Fecha</th>
-          <th>Descargar</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for carpeta in carpetas %}
-          {% if carpeta.archivos.all %}
-            {% for archivo in carpeta.archivos.all %}
-              <tr>
-                <td>{{ carpeta.nombre }}</td>
-                <td>{{ archivo.nombre }}</td>
-                <td>{{ archivo.fecha_subida|date:"Y-m-d H:i" }}</td>
-                <td>
-                  <a href="{{ archivo.archivo.url }}" target="_blank" class="link-archivo">Ver</a>
-                </td>
-               <td>
-                <button class="btn btn-icon" onclick="editarArchivo({{ archivo.id }}); event.preventDefault();" title="Editar">
-                <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn btn-icon" onclick="eliminarArchivo({{ archivo.id }}); event.preventDefault();" title="Eliminar">
-                <i class="fas fa-trash-alt"></i>
-                </button>
-                </td>
-
-              </tr>
-            {% endfor %}
-          {% else %}
-            <tr>
-              <td>{{ carpeta.nombre }}</td>
-              <td colspan="3">Sin archivos</td>
-              <td></td>
-            </tr>
+    {% if carpetas %}
+    <div class="carpetas-grid">
+      {% for carpeta in carpetas %}
+      <div class="carpeta-card">
+        <div class="carpeta-header">
+          <h3 class="carpeta-titulo">
+            <i class="fas fa-folder"></i>
+            {{ carpeta.nombre }}
+          </h3>
+          {% if carpeta.descripcion %}
+          <p class="carpeta-descripcion">{{ carpeta.descripcion }}</p>
           {% endif %}
-        {% empty %}
-          <tr>
-            <td colspan="5">No tienes carpetas.</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+        </div>
+        
+        <div class="carpeta-body">
+          <!-- Estadísticas de la carpeta -->
+          <div class="carpeta-stats">
+            <div class="stat-item">
+              <i class="fas fa-file"></i>
+              <span>{{ carpeta.archivos.count }} archivo{{ carpeta.archivos.count|pluralize:"s" }}</span>
+            </div>
+            {% if carpeta.subcarpetas.all %}
+            <div class="stat-item">
+              <i class="fas fa-folder"></i>
+              <span>{{ carpeta.subcarpetas.count }} subcarpeta{{ carpeta.subcarpetas.count|pluralize:"s" }}</span>
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="archivos-lista">
+            {% if carpeta.archivos.all %}
+              {% for archivo in carpeta.archivos.all %}
+              <div class="archivo-item" data-archivo-id="{{ archivo.id }}">
+                <div class="archivo-info">
+                  <i class="fas fa-file-alt"></i>
+                  <div class="archivo-detalles">
+                    <span class="archivo-nombre">{{ archivo.nombre }}</span>
+                    <small class="archivo-fecha">{{ archivo.fecha_subida|date:"d/m/Y H:i" }}</small>
+                  </div>
+                </div>
+                <div class="archivo-acciones">
+                  <a href="{{ archivo.archivo.url }}" target="_blank" class="btn btn-sm btn-outline-primary" title="Ver archivo">
+                    <i class="fas fa-eye"></i>
+                  </a>
+                  {% if archivo.usuario == request.user %}
+                  <button class="btn btn-sm btn-outline-warning" onclick="editarArchivo({{ archivo.id }})" title="Editar">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger" onclick="eliminarArchivo({{ archivo.id }})" title="Eliminar">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                  {% endif %}
+                </div>
+              </div>
+              {% endfor %}
+            {% else %}
+              <div class="sin-archivos">
+                <div class="empty-icon">
+                  <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <h4 class="empty-title">No hay archivos en esta carpeta</h4>
+                <p class="empty-description">¡Sé el primero en subir un archivo!</p>
+                <button class="btn-upload-first" onclick="subirArchivoACarpeta({{ carpeta.id }}, '{{ carpeta.nombre }}')">
+                  <div class="btn-upload-icon">
+                    <i class="fas fa-plus"></i>
+                  </div>
+                  <span class="btn-upload-text">Subir primer archivo</span>
+                </button>
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Subcarpetas -->
+          {% if carpeta.subcarpetas.all %}
+          <div class="subcarpetas-section">
+            <h4 class="subcarpetas-titulo">
+              <i class="fas fa-folder-plus"></i> Subcarpetas
+            </h4>
+            {% for subcarpeta in carpeta.subcarpetas.all %}
+            <div class="subcarpeta-item">
+              <span class="subcarpeta-nombre">
+                <i class="fas fa-folder"></i> {{ subcarpeta.nombre }}
+              </span>
+              <span class="subcarpeta-archivos">
+                {{ subcarpeta.archivos.count }} archivo{{ subcarpeta.archivos.count|pluralize:"s" }}
+              </span>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <i class="fas fa-folder-open"></i>
+      <h3>No hay carpetas disponibles</h3>
+      <p>El administrador aún no ha creado carpetas para el período académico activo.</p>
+    </div>
+    {% endif %}
   </section>
 
 </div>
@@ -70,6 +151,677 @@
 
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+/* Estilos específicos para el dashboard del usuario */
+.carpetas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.carpeta-card {
+  background: white;
+  border: 1px solid #e8ecef;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.carpeta-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+  border-color: #46A29F;
+}
+
+.carpeta-header {
+  background: linear-gradient(135deg, #46A29F 0%, #003366 100%);
+  color: white;
+  padding: 15px 18px;
+  position: relative;
+  overflow: hidden;
+}
+
+.carpeta-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  transform: translate(20px, -20px);
+}
+
+.carpeta-titulo {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.carpeta-titulo i {
+  margin-right: 8px;
+  font-size: 1.1rem;
+}
+
+.carpeta-descripcion {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.8rem;
+  margin: 5px 0 0 0;
+  position: relative;
+  z-index: 1;
+}
+
+.carpeta-body {
+  padding: 15px 18px;
+}
+
+.carpeta-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 3px solid #46A29F;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  font-size: 0.85rem;
+  color: #495057;
+}
+
+.stat-item i {
+  margin-right: 5px;
+  color: #46A29F;
+}
+
+.archivo-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  background: #fafbfc;
+  transition: all 0.2s ease;
+}
+
+.archivo-item:hover {
+  background: #f0f8ff;
+  border-color: #46A29F;
+  transform: translateX(3px);
+}
+
+.archivo-info {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.archivo-info i {
+  color: #46A29F;
+  margin-right: 8px;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.archivo-detalles {
+  min-width: 0;
+  flex: 1;
+}
+
+.archivo-nombre {
+  font-weight: 500;
+  color: #333;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+
+.archivo-fecha {
+  color: #6c757d;
+  font-size: 0.7rem;
+}
+
+.archivo-acciones {
+  display: flex;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.archivo-acciones .btn {
+  padding: 4px 8px;
+  font-size: 0.7rem;
+  border-radius: 4px;
+  min-width: auto;
+}
+
+.sin-archivos {
+  text-align: center;
+  padding: 25px 15px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 10px;
+  border: 2px dashed #dee2e6;
+}
+
+.empty-icon {
+  width: 50px;
+  height: 50px;
+  margin: 0 auto 15px;
+  background: linear-gradient(135deg, #46A29F 0%, #003366 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(70, 162, 159, 0.3);
+}
+
+.empty-icon i {
+  font-size: 20px;
+  color: white;
+}
+
+.empty-title {
+  color: #495057;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.empty-description {
+  color: #6c757d;
+  font-size: 0.8rem;
+  margin-bottom: 15px;
+}
+
+.btn-upload-first {
+  background: linear-gradient(135deg, #46A29F 0%, #003366 100%);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 3px 10px rgba(70, 162, 159, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-upload-first:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(70, 162, 159, 0.4);
+  background: linear-gradient(135deg, #3d8b88 0%, #002244 100%);
+}
+
+.btn-upload-icon {
+  width: 18px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-upload-icon i {
+  font-size: 10px;
+}
+
+/* Subcarpetas compactas */
+.subcarpetas-section {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e9ecef;
+}
+
+.subcarpetas-titulo {
+  font-size: 0.8rem;
+  color: #495057;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.subcarpetas-titulo i {
+  margin-right: 5px;
+  color: #46A29F;
+}
+
+.subcarpeta-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  margin-bottom: 4px;
+  font-size: 0.8rem;
+}
+
+.subcarpeta-nombre {
+  color: #495057;
+  font-weight: 500;
+}
+
+.subcarpeta-nombre i {
+  margin-right: 5px;
+  color: #46A29F;
+  font-size: 0.75rem;
+}
+
+.subcarpeta-archivos {
+  color: #6c757d;
+  font-size: 0.7rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .carpetas-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .carpeta-card {
+    margin: 0 5px;
+  }
+  
+  .archivo-nombre {
+    font-size: 0.8rem;
+  }
+  
+  .archivo-acciones .btn {
+    padding: 3px 6px;
+    font-size: 0.65rem;
+  }
+}
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-upload-icon i {
+  font-size: 12px;
+}
+
+.btn-upload-text {
+  font-weight: 600;
+}
+
+/* Modal de subida personalizado */
+.upload-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  backdrop-filter: blur(5px);
+}
+
+.upload-modal {
+  background: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.upload-modal-header {
+  background: linear-gradient(135deg, #46A29F 0%, #003366 100%);
+  color: white;
+  padding: 20px;
+  position: relative;
+}
+
+.upload-modal-header h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.upload-folder-name {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  margin-top: 5px;
+  display: block;
+}
+
+.upload-close-btn {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.upload-close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.upload-modal-body {
+  padding: 30px;
+}
+
+.upload-drop-zone {
+  border: 3px dashed #dee2e6;
+  border-radius: 12px;
+  padding: 40px 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  background: #f8f9fa;
+}
+
+.upload-drop-zone:hover {
+  border-color: #46A29F;
+  background: #f0f8ff;
+}
+
+.upload-drop-zone.drag-over {
+  border-color: #46A29F;
+  background: linear-gradient(135deg, rgba(70, 162, 159, 0.1) 0%, rgba(0, 51, 102, 0.1) 100%);
+  transform: scale(1.02);
+}
+
+.upload-icon {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 20px;
+  background: linear-gradient(135deg, #46A29F 0%, #003366 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(70, 162, 159, 0.3);
+}
+
+.upload-icon i {
+  font-size: 24px;
+  color: white;
+}
+
+.upload-main-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 8px;
+}
+
+.upload-sub-text {
+  color: #6c757d;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+}
+
+.upload-browse-btn {
+  background: linear-gradient(135deg, #46A29F 0%, #003366 100%);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(70, 162, 159, 0.3);
+}
+
+.upload-browse-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(70, 162, 159, 0.4);
+}
+
+.upload-file-info {
+  text-align: center;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 2px solid #e9ecef;
+}
+
+.file-preview {
+  margin-bottom: 20px;
+}
+
+.file-preview i {
+  font-size: 48px;
+  color: #46A29F;
+  margin-bottom: 10px;
+}
+
+.file-name {
+  display: block;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 5px;
+  word-break: break-all;
+}
+
+.file-size {
+  display: block;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.upload-submit-btn {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 12px 30px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.upload-submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+.upload-submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.subcarpetas-section {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+.subcarpetas-titulo {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.subcarpeta-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 10px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  margin-bottom: 5px;
+}
+
+.subcarpeta-nombre {
+  color: #495057;
+}
+
+.subcarpeta-archivos {
+  color: #6c757d;
+  font-size: 0.8rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #888;
+}
+
+.empty-state i {
+  font-size: 4rem;
+  color: #ddd;
+  margin-bottom: 20px;
+}
+
+.empty-state h3 {
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.archivo-info-tabla {
+  display: flex;
+  align-items: center;
+}
+
+.archivo-info-tabla i {
+  margin-right: 8px;
+  color: #17a2b8;
+}
+
+.alert {
+  padding: 15px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+}
+
+.alert-info {
+  background-color: #d1ecf1;
+  border-color: #bee5eb;
+  color: #0c5460;
+}
+
+.alert-warning {
+  background-color: #fff3cd;
+  border-color: #ffeaa7;
+  color: #856404;
+}
+
+.badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.badge-info {
+  background-color: #17a2b8;
+  color: white;
+}
+
+/* Estilos para períodos activos */
+.periodos-activos {
+  margin-bottom: 20px;
+}
+
+.periodo-item {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 10px;
+  color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.periodo-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.periodo-nombre {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.periodo-nombre i {
+  margin-right: 8px;
+}
+
+.periodo-admin {
+  font-size: 0.9em;
+  opacity: 0.9;
+  display: flex;
+  align-items: center;
+}
+
+.periodo-admin i {
+  margin-right: 5px;
+}
+
+.periodo-fechas {
+  font-size: 0.85em;
+  opacity: 0.8;
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.periodo-fechas i {
+  margin-right: 5px;
+}
+</style>
 
 <script>
   const modalFondo = document.getElementById('modalFondo');
@@ -126,44 +878,380 @@
     modalCarpeta.innerHTML = '';
   }
 
-  // Botón general para subir archivos
-  document.querySelector('.btn-subir-general').onclick = () => {
-    Swal.fire({
-      title: 'Selecciona una carpeta',
-      input: 'select',
-      inputOptions: {
-        {% for carpeta in carpetas %}
-          '{{ carpeta.id }}': '{{ carpeta.nombre }}',
-        {% endfor %}
-      },
-      inputPlaceholder: 'Elige una carpeta',
-      showCancelButton: true,
-      confirmButtonText: 'Seleccionar',
-      cancelButtonText: 'Cancelar',
-      preConfirm: (carpetaId) => {
-        if (!carpetaId) {
-          Swal.showValidationMessage('Debes seleccionar una carpeta');
-        } else {
-          abrirModal(`/subir_archivo/${carpetaId}/`);
-        }
+  // Función específica para subir archivo a una carpeta
+  function subirArchivoACarpeta(carpetaId, carpetaNombre) {
+    mostrarModalSubirArchivo(carpetaId, carpetaNombre);
+  }
+
+  // Modal personalizado para subir archivos
+  function mostrarModalSubirArchivo(carpetaId, carpetaNombre) {
+    const modalHTML = `
+      <div id="uploadModal" class="upload-modal-overlay">
+        <div class="upload-modal">
+          <div class="upload-modal-header">
+            <h3><i class="fas fa-cloud-upload-alt"></i> Subir archivo</h3>
+            <span class="upload-folder-name">a "${carpetaNombre}"</span>
+            <button class="upload-close-btn" onclick="cerrarModalUpload()">&times;</button>
+          </div>
+          <div class="upload-modal-body">
+            <div class="upload-drop-zone" id="dropZone">
+              <div class="upload-icon">
+                <i class="fas fa-cloud-upload-alt"></i>
+              </div>
+              <div class="upload-text">
+                <p class="upload-main-text">Arrastra tu archivo aquí</p>
+                <p class="upload-sub-text">o</p>
+                <button type="button" class="upload-browse-btn" onclick="document.getElementById('fileInput').click()">
+                  Seleccionar archivo
+                </button>
+              </div>
+              <input type="file" id="fileInput" style="display: none;" onchange="handleFileSelect(this.files[0], ${carpetaId})">
+            </div>
+            <div class="upload-file-info" id="fileInfo" style="display: none;">
+              <div class="file-preview">
+                <i class="fas fa-file"></i>
+                <span class="file-name"></span>
+                <span class="file-size"></span>
+              </div>
+              <button class="upload-submit-btn" onclick="subirArchivoSeleccionado()">
+                <i class="fas fa-upload"></i> Subir archivo
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Configurar drag & drop
+    const dropZone = document.getElementById('dropZone');
+    
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('drag-over');
+    });
+    
+    dropZone.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('drag-over');
+    });
+    
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('drag-over');
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        handleFileSelect(files[0], carpetaId);
       }
     });
-  };
+  }
+
+  let archivoSeleccionado = null;
+  let carpetaDestino = null;
+
+  function handleFileSelect(file, carpetaId) {
+    archivoSeleccionado = file;
+    carpetaDestino = carpetaId;
+    
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = fileInfo.querySelector('.file-name');
+    const fileSize = fileInfo.querySelector('.file-size');
+    
+    fileName.textContent = file.name;
+    fileSize.textContent = formatFileSize(file.size);
+    
+    document.getElementById('dropZone').style.display = 'none';
+    fileInfo.style.display = 'block';
+  }
+
+  function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+
+  function subirArchivoSeleccionado() {
+    if (!archivoSeleccionado || !carpetaDestino) return;
+    
+    const formData = new FormData();
+    formData.append('archivo', archivoSeleccionado);
+    formData.append('nombre', archivoSeleccionado.name.split('.')[0]);
+    formData.append('carpeta', carpetaDestino);
+    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+    
+    // Mostrar loading
+    const submitBtn = document.querySelector('.upload-submit-btn');
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Subiendo...';
+    submitBtn.disabled = true;
+    
+    fetch(`/subir_archivo/${carpetaDestino}/`, {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        cerrarModalUpload();
+        Swal.fire({
+          icon: 'success',
+          title: '¡Archivo subido!',
+          text: 'El archivo se ha subido correctamente',
+          timer: 2000,
+          showConfirmButton: false
+        });
+        setTimeout(() => location.reload(), 2000);
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo subir el archivo'
+        });
+        submitBtn.innerHTML = '<i class="fas fa-upload"></i> Subir archivo';
+        submitBtn.disabled = false;
+      }
+    })
+    .catch(error => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error de red',
+        text: 'No se pudo conectar al servidor'
+      });
+      submitBtn.innerHTML = '<i class="fas fa-upload"></i> Subir archivo';
+      submitBtn.disabled = false;
+    });
+  }
+
+  function cerrarModalUpload() {
+    const modal = document.getElementById('uploadModal');
+    if (modal) {
+      modal.remove();
+    }
+    archivoSeleccionado = null;
+    carpetaDestino = null;
+  }
 
   // Editar archivo
   function editarArchivo(id) {
-    abrirModal(`/editar_archivo/${id}/`);
+    // Cargar el contenido del modal sin mostrar loading de SweetAlert
+    fetch(`/editar_archivo/${id}/`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.text();
+      })
+      .then(html => {
+        // Remover modal existente si existe
+        const existingModal = document.querySelector('#editarArchivoModal');
+        if (existingModal) {
+          existingModal.remove();
+        }
+        
+        // Remover backdrop existente
+        const existingBackdrop = document.querySelector('.modal-backdrop');
+        if (existingBackdrop) {
+          existingBackdrop.remove();
+        }
+        
+        // Agregar el nuevo modal al body
+        document.body.insertAdjacentHTML('beforeend', html);
+        
+        // Obtener el modal recién agregado
+        const modalElement = document.querySelector('#editarArchivoModal');
+        
+        if (modalElement) {
+          let modalInstance = null;
+          
+          // Función para cerrar el modal
+          function cerrarModal() {
+            if (modalInstance && typeof bootstrap !== 'undefined') {
+              modalInstance.hide();
+            } else if (typeof $ !== 'undefined' && $.fn.modal) {
+              $(modalElement).modal('hide');
+            } else {
+              // Fallback manual
+              modalElement.style.display = 'none';
+              modalElement.classList.remove('show');
+              document.body.classList.remove('modal-open');
+              const backdrop = document.querySelector('.modal-backdrop');
+              if (backdrop) backdrop.remove();
+              modalElement.remove();
+            }
+          }
+          
+          // Inicializar modal según la versión de Bootstrap
+          if (typeof bootstrap !== 'undefined') {
+            // Bootstrap 5
+            modalInstance = new bootstrap.Modal(modalElement, {
+              backdrop: 'static',
+              keyboard: true
+            });
+            modalInstance.show();
+          } else if (typeof $ !== 'undefined' && $.fn.modal) {
+            // Bootstrap 4 con jQuery
+            $(modalElement).modal({
+              backdrop: 'static',
+              keyboard: true
+            });
+            $(modalElement).modal('show');
+          } else {
+            // Fallback manual
+            modalElement.style.display = 'block';
+            modalElement.classList.add('show');
+            document.body.classList.add('modal-open');
+            
+            // Crear backdrop
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade show';
+            backdrop.style.zIndex = '9998';
+            document.body.appendChild(backdrop);
+          }
+          
+          // Manejar el envío del formulario
+          const form = modalElement.querySelector('#editarArchivoForm');
+          if (form) {
+            form.addEventListener('submit', function(e) {
+              e.preventDefault();
+              
+              const formData = new FormData(form);
+              
+              // Mostrar loading en el botón
+              const submitBtn = form.querySelector('button[type="submit"]');
+              const originalText = submitBtn.innerHTML;
+              submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+              submitBtn.disabled = true;
+              
+              fetch(`/editar_archivo/${id}/`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                  'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+              })
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+              })
+              .then(data => {
+                if (data.success) {
+                  // Cerrar modal
+                  cerrarModal();
+                  
+                  // Actualizar dinámicamente el nombre del archivo en la interfaz
+                  const archivoElement = document.querySelector(`[data-archivo-id="${id}"]`);
+                  if (archivoElement) {
+                    const nombreElement = archivoElement.querySelector('.archivo-nombre');
+                    if (nombreElement && data.nuevo_nombre) {
+                      nombreElement.textContent = data.nuevo_nombre;
+                    }
+                  }
+                  
+                  // Mostrar mensaje de éxito sin recargar
+                  Swal.fire({
+                    icon: 'success',
+                    title: '¡Archivo editado!',
+                    text: 'El archivo se ha editado correctamente',
+                    timer: 2000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                  });
+                } else {
+                  submitBtn.innerHTML = originalText;
+                  submitBtn.disabled = false;
+                  
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.error || 'No se pudo editar el archivo'
+                  });
+                }
+              })
+              .catch(error => {
+                console.error('Error:', error);
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error de red',
+                  text: 'No se pudo conectar al servidor'
+                });
+              });
+            });
+          }
+          
+          // Manejar todos los botones de cierre
+          const closeButtons = modalElement.querySelectorAll('[data-bs-dismiss="modal"], [data-dismiss="modal"], .btn-close');
+          closeButtons.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+              e.preventDefault();
+              cerrarModal();
+            });
+          });
+          
+          // Manejar clic en el backdrop
+          modalElement.addEventListener('click', function(e) {
+            if (e.target === modalElement) {
+              cerrarModal();
+            }
+          });
+          
+          // Manejar tecla Escape
+          document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modalElement.classList.contains('show')) {
+              cerrarModal();
+            }
+          });
+          
+          // Limpiar el modal cuando se cierre (Bootstrap 5)
+          if (typeof bootstrap !== 'undefined') {
+            modalElement.addEventListener('hidden.bs.modal', function() {
+              modalElement.remove();
+              document.body.classList.remove('modal-open');
+              const backdrop = document.querySelector('.modal-backdrop');
+              if (backdrop) backdrop.remove();
+            });
+          }
+          
+          // Para jQuery/Bootstrap 4
+          if (typeof $ !== 'undefined') {
+            $(modalElement).on('hidden.bs.modal', function() {
+              modalElement.remove();
+              document.body.classList.remove('modal-open');
+              const backdrop = document.querySelector('.modal-backdrop');
+              if (backdrop) backdrop.remove();
+            });
+          }
+        } else {
+          throw new Error('Modal element not found in response');
+        }
+      })
+      .catch(error => {
+        console.error('Error al cargar el modal:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo cargar el formulario de edición'
+        });
+      });
   }
 
   // Eliminar archivo
   function eliminarArchivo(id) {
     Swal.fire({
       title: '¿Estás seguro?',
-      text: "Esta acción eliminará el archivo",
+      text: "Esta acción eliminará el archivo permanentemente",
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#dc3545'
     }).then((result) => {
       if (result.isConfirmed) {
         fetch(`/eliminar_archivo/${id}/`, {
@@ -203,6 +1291,7 @@
     });
   }
 
+  // Cerrar modal si se hace click fuera
   modalFondo.onclick = cerrarModal;
 </script>
 {% endblock %}

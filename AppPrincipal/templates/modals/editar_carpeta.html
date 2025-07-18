@@ -1,6 +1,333 @@
-<form method="post" id="formEditarCarpeta">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Guardar cambios</button>
-  </form>
+<div class="modal fade" id="editarCarpetaModal" tabindex="-1" role="dialog" aria-labelledby="editarCarpetaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header bg-institucional text-white border-0">
+                <h5 class="modal-title d-flex align-items-center" id="editarCarpetaModalLabel">
+                    <div class="icon-circle bg-white bg-opacity-20 me-3">
+                        <i class="fas fa-edit text-white"></i>
+                    </div>
+                    Editar Carpeta
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editarCarpetaForm" method="post">
+                <div class="modal-body p-4">
+                    {% csrf_token %}
+                    
+                    <div class="input-group-custom mb-4">
+                        <div class="input-wrapper">
+                            <input type="text" 
+                                   class="form-control-custom" 
+                                   id="{{ form.nombre.id_for_label }}" 
+                                   name="{{ form.nombre.name }}" 
+                                   value="{{ form.nombre.value|default:'' }}"
+                                   placeholder=" "
+                                   required>
+                            <label for="{{ form.nombre.id_for_label }}" class="label-custom">
+                                <i class="fas fa-folder me-2"></i>Nombre de la Carpeta
+                            </label>
+                            <div class="input-border"></div>
+                        </div>
+                    </div>
+
+                    <div class="input-group-custom mb-4">
+                        <div class="input-wrapper">
+                            <textarea class="form-control-custom textarea-custom" 
+                                      id="{{ form.descripcion.id_for_label }}" 
+                                      name="{{ form.descripcion.name }}" 
+                                      placeholder=" "
+                                      rows="3">{{ form.descripcion.value|default:'' }}</textarea>
+                            <label for="{{ form.descripcion.id_for_label }}" class="label-custom">
+                                <i class="fas fa-align-left me-2"></i>Descripción
+                            </label>
+                            <div class="input-border"></div>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-custom mb-4">
+                        <div class="checkbox-wrapper">
+                            <input class="checkbox-input" 
+                                   type="checkbox" 
+                                   id="{{ form.publica.id_for_label }}" 
+                                   name="{{ form.publica.name }}"
+                                   {% if form.publica.value %}checked{% endif %}>
+                            <label class="checkbox-label" for="{{ form.publica.id_for_label }}">
+                                <span class="checkbox-custom-box">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                                <div class="checkbox-text">
+                                    <span class="checkbox-title">
+                                        <i class="fas fa-globe me-2"></i>Carpeta Pública
+                                    </span>
+                                    <span class="checkbox-description">
+                                        Si está marcada, otros usuarios podrán ver esta carpeta
+                                    </span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="alert-custom">
+                        <div class="alert-icon">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div class="alert-content">
+                            <strong>Información:</strong> Los cambios se aplicarán inmediatamente después de guardar.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer border-0 bg-light p-4 justify-content-end">
+                    <button type="submit" class="btn-custom btn-primary-custom">
+                        <i class="fas fa-save me-2"></i>Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Colores institucionales */
+.bg-institucional {
+    background: linear-gradient(135deg, #003366 0%, #02385F 100%);
+}
+
+.icon-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Inputs personalizados */
+.input-group-custom {
+    position: relative;
+}
+
+.input-wrapper {
+    position: relative;
+    margin-bottom: 8px;
+}
+
+.form-control-custom {
+    width: 100%;
+    padding: 16px 12px 8px 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    font-size: 16px;
+    background: #ffffff;
+    transition: all 0.3s ease;
+    outline: none;
+    font-family: inherit;
+}
+
+.textarea-custom {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-control-custom:focus {
+    border-color: #46A29F;
+    box-shadow: 0 0 0 3px rgba(70, 162, 159, 0.1);
+}
+
+.label-custom {
+    position: absolute;
+    left: 12px;
+    top: 16px;
+    color: #6c757d;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    background: white;
+    padding: 0 4px;
+}
+
+.form-control-custom:focus ~ .label-custom,
+.form-control-custom:not(:placeholder-shown) ~ .label-custom {
+    top: -8px;
+    font-size: 12px;
+    color: #46A29F;
+    font-weight: 600;
+}
+
+.input-border {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #46A29F, #003366);
+    transition: width 0.3s ease;
+}
+
+.form-control-custom:focus ~ .input-border {
+    width: 100%;
+}
+
+/* Checkbox personalizado */
+.checkbox-custom {
+    margin: 20px 0;
+}
+
+.checkbox-wrapper {
+    position: relative;
+}
+
+.checkbox-input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    cursor: pointer;
+    padding: 16px;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    background: #ffffff;
+    transition: all 0.3s ease;
+}
+
+.checkbox-label:hover {
+    border-color: #46A29F;
+    background: #f8fffe;
+}
+
+.checkbox-input:checked + .checkbox-label {
+    border-color: #46A29F;
+    background: linear-gradient(135deg, #f8fffe 0%, #f0fffe 100%);
+}
+
+.checkbox-custom-box {
+    width: 24px;
+    height: 24px;
+    border: 2px solid #dee2e6;
+    border-radius: 6px;
+    margin-right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.checkbox-input:checked + .checkbox-label .checkbox-custom-box {
+    background: #46A29F;
+    border-color: #46A29F;
+    color: white;
+}
+
+.checkbox-custom-box i {
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.checkbox-input:checked + .checkbox-label .checkbox-custom-box i {
+    opacity: 1;
+}
+
+.checkbox-text {
+    flex: 1;
+}
+
+.checkbox-title {
+    display: block;
+    font-weight: 600;
+    color: #003366;
+    margin-bottom: 4px;
+}
+
+.checkbox-description {
+    display: block;
+    font-size: 14px;
+    color: #6c757d;
+    line-height: 1.4;
+}
+
+/* Alerta personalizada */
+.alert-custom {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    background: linear-gradient(135deg, #e8f4fd 0%, #f0f8ff 100%);
+    border: 1px solid #46A29F;
+    border-radius: 12px;
+    margin-top: 20px;
+}
+
+.alert-icon {
+    width: 40px;
+    height: 40px;
+    background: #46A29F;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.alert-content {
+    color: #003366;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.alert-content strong {
+    color: #46A29F;
+}
+
+/* Botones personalizados */
+.btn-custom {
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary-custom {
+    background: linear-gradient(135deg, #46A29F 0%, #003366 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(70, 162, 159, 0.3);
+}
+
+.btn-primary-custom:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(70, 162, 159, 0.4);
+}
+
+.btn-secondary-custom {
+    background: #f8f9fa;
+    color: #6c757d;
+    border: 2px solid #e9ecef;
+}
+
+.btn-secondary-custom:hover {
+    background: #e9ecef;
+    color: #495057;
+    transform: translateY(-1px);
+}
+
+.modal-content {
+    border-radius: 15px;
+    overflow: hidden;
+}
+</style>
   

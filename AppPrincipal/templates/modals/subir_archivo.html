@@ -1,0 +1,349 @@
+<div class="modal fade" id="subirArchivoModal" tabindex="-1" role="dialog" aria-labelledby="subirArchivoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header bg-institucional text-white border-0">
+                <h5 class="modal-title d-flex align-items-center" id="subirArchivoModalLabel">
+                    <div class="icon-circle bg-white bg-opacity-20 me-3">
+                        <i class="fas fa-cloud-upload-alt text-white"></i>
+                    </div>
+                    Subir Archivo
+                    {% if carpeta %}
+                        a "{{ carpeta.nombre }}"
+                    {% endif %}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="subirArchivoForm" method="post" enctype="multipart/form-data">
+                <div class="modal-body p-4">
+                    {% csrf_token %}
+                    
+                    {% if periodo_activo %}
+                    <div class="alert-custom mb-4">
+                        <div class="alert-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="alert-content">
+                            <strong>Período Académico:</strong> {{ periodo_activo.nombre }} ({{ periodo_activo.año }})
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="input-group-custom mb-4">
+                        <div class="input-wrapper">
+                            <input type="text" 
+                                   class="form-control-custom" 
+                                   id="{{ form.nombre.id_for_label }}" 
+                                   name="{{ form.nombre.name }}" 
+                                   placeholder=" "
+                                   required>
+                            <label for="{{ form.nombre.id_for_label }}" class="label-custom">
+                                <i class="fas fa-file-signature me-2"></i>Nombre del Archivo
+                            </label>
+                            <div class="input-border"></div>
+                        </div>
+                    </div>
+
+                    <div class="file-upload-area mb-4">
+                        <div class="file-upload-wrapper">
+                            <input type="file" 
+                                   class="file-input" 
+                                   id="{{ form.archivo.id_for_label }}" 
+                                   name="{{ form.archivo.name }}" 
+                                   required>
+                            <label for="{{ form.archivo.id_for_label }}" class="file-upload-label">
+                                <div class="upload-icon">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                </div>
+                                <div class="upload-text">
+                                    <span class="upload-title">Seleccionar Archivo</span>
+                                    <span class="upload-subtitle">Haz clic aquí o arrastra tu archivo</span>
+                                </div>
+                            </label>
+                            <div class="file-name-display"></div>
+                        </div>
+                    </div>
+
+                    {% if not carpeta %}
+                    <div class="input-group-custom mb-4">
+                        <div class="input-wrapper">
+                            <select class="form-control-custom" 
+                                    id="{{ form.carpeta.id_for_label }}" 
+                                    name="{{ form.carpeta.name }}" 
+                                    required>
+                                <option value="">Selecciona una carpeta</option>
+                                {% for carpeta_option in carpetas_disponibles %}
+                                    <option value="{{ carpeta_option.id }}">{{ carpeta_option.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="{{ form.carpeta.id_for_label }}" class="label-custom">
+                                <i class="fas fa-folder me-2"></i>Carpeta de Destino
+                            </label>
+                            <div class="input-border"></div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <input type="hidden" name="carpeta" value="{{ carpeta.id }}">
+                    {% endif %}
+
+                    <div class="alert-custom">
+                        <div class="alert-icon">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div class="alert-content">
+                            <strong>Información:</strong> El archivo se subirá al período académico activo y será visible para otros usuarios si la carpeta es pública.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer border-0 bg-light p-4 justify-content-between">
+                    <button type="button" class="btn-custom btn-secondary-custom" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </button>
+                    <button type="submit" class="btn-custom btn-primary-custom">
+                        <i class="fas fa-cloud-upload-alt me-2"></i>Subir Archivo
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Colores institucionales */
+.bg-institucional {
+    background: linear-gradient(135deg, #003366 0%, #02385F 100%);
+}
+
+.icon-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Inputs personalizados */
+.input-group-custom {
+    position: relative;
+}
+
+.input-wrapper {
+    position: relative;
+    margin-bottom: 8px;
+}
+
+.form-control-custom {
+    width: 100%;
+    padding: 16px 12px 8px 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    font-size: 16px;
+    background: #ffffff;
+    transition: all 0.3s ease;
+    outline: none;
+    font-family: inherit;
+}
+
+.form-control-custom:focus {
+    border-color: #46A29F;
+    box-shadow: 0 0 0 3px rgba(70, 162, 159, 0.1);
+}
+
+.label-custom {
+    position: absolute;
+    left: 12px;
+    top: 16px;
+    color: #6c757d;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    background: white;
+    padding: 0 4px;
+}
+
+.form-control-custom:focus ~ .label-custom,
+.form-control-custom:not(:placeholder-shown) ~ .label-custom,
+.form-control-custom:valid ~ .label-custom {
+    top: -8px;
+    font-size: 12px;
+    color: #46A29F;
+    font-weight: 600;
+}
+
+.input-border {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #46A29F, #003366);
+    transition: width 0.3s ease;
+}
+
+.form-control-custom:focus ~ .input-border {
+    width: 100%;
+}
+
+/* Área de subida de archivos */
+.file-upload-area {
+    position: relative;
+}
+
+.file-upload-wrapper {
+    position: relative;
+}
+
+.file-input {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.file-upload-label {
+    display: flex;
+    align-items: center;
+    padding: 24px;
+    border: 2px dashed #46A29F;
+    border-radius: 12px;
+    background: #f8fffe;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 0;
+}
+
+.file-upload-label:hover {
+    background: #e8f4f8;
+    border-color: #003366;
+}
+
+.upload-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #46A29F 0%, #003366 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+}
+
+.upload-icon i {
+    font-size: 24px;
+    color: white;
+}
+
+.upload-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.upload-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #003366;
+    margin-bottom: 4px;
+}
+
+.upload-subtitle {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.file-name-display {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: #e8f4f8;
+    border-radius: 6px;
+    color: #003366;
+    font-weight: 500;
+    display: none;
+}
+
+/* Alert personalizado */
+.alert-custom {
+    background: #e8f4f8;
+    border: 1px solid #46A29F;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    align-items: flex-start;
+}
+
+.alert-icon {
+    color: #46A29F;
+    margin-right: 12px;
+    font-size: 18px;
+    margin-top: 2px;
+}
+
+.alert-content {
+    flex: 1;
+    color: #003366;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Botones personalizados */
+.btn-custom {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.btn-primary-custom {
+    background: linear-gradient(135deg, #46A29F 0%, #003366 100%);
+    color: white;
+}
+
+.btn-primary-custom:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(70, 162, 159, 0.3);
+    color: white;
+}
+
+.btn-secondary-custom {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary-custom:hover {
+    background: #5a6268;
+    color: white;
+}
+</style>
+
+<script>
+// Mostrar nombre del archivo seleccionado
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.querySelector('.file-input');
+    const fileNameDisplay = document.querySelector('.file-name-display');
+    const uploadLabel = document.querySelector('.file-upload-label');
+    
+    if (fileInput) {
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                fileNameDisplay.textContent = `Archivo seleccionado: ${file.name}`;
+                fileNameDisplay.style.display = 'block';
+                uploadLabel.style.borderColor = '#46A29F';
+                uploadLabel.style.background = '#e8f4f8';
+            } else {
+                fileNameDisplay.style.display = 'none';
+                uploadLabel.style.borderColor = '#46A29F';
+                uploadLabel.style.background = '#f8fffe';
+            }
+        });
+    }
+});
+</script>
