@@ -1,8 +1,559 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-<div class="admin-panel">
+<style>
+  /* Variables CSS para colores institucionales */
+  :root {
+    --primary-color: #1e3a8a;
+    --primary-light: #3b82f6;
+    --primary-dark: #1e40af;
+    --secondary-color: #64748b;
+    --success-color: #10b981;
+    --danger-color: #ef4444;
+    --warning-color: #f59e0b;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --gray-800: #1e293b;
+    --gray-900: #0f172a;
+    --white: #ffffff;
+    --border-radius: 8px;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  }
 
+  /* Reset y base */
+  * {
+    box-sizing: border-box;
+  }
+
+  /* Header de sección limpio */
+  .section-header-clean {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding: 0;
+  }
+
+  .header-left .section-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .header-left .section-title i {
+    color: var(--primary-color);
+    font-size: 20px;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 12px;
+  }
+
+  /* Botones limpios */
+  .btn-clean {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+
+  .btn-clean.primary {
+    background-color: var(--primary-color);
+    color: var(--white);
+  }
+
+  .btn-clean.primary:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .btn-clean.secondary {
+    background-color: var(--white);
+    color: var(--gray-700);
+    border: 1px solid var(--gray-300);
+  }
+
+  .btn-clean.secondary:hover {
+    background-color: var(--gray-50);
+    border-color: var(--gray-400);
+  }
+
+  /* Toolbar minimalista */
+  .toolbar-clean {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding: 16px 20px;
+    background-color: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius);
+  }
+
+  .search-container {
+    flex: 1;
+    max-width: 400px;
+  }
+
+  .search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 12px;
+    color: var(--gray-400);
+    font-size: 14px;
+    z-index: 1;
+  }
+
+  .search-input-clean {
+    width: 100%;
+    padding: 10px 12px 10px 36px;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius);
+    font-size: 14px;
+    background-color: var(--white);
+    transition: border-color 0.2s ease;
+  }
+
+  .search-input-clean:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgb(59 130 246 / 0.1);
+  }
+
+  .view-toggle {
+    display: flex;
+    background-color: var(--gray-100);
+    border-radius: var(--border-radius);
+    padding: 2px;
+  }
+
+  .toggle-btn {
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    color: var(--gray-600);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+  }
+
+  .toggle-btn.active {
+    background-color: var(--white);
+    color: var(--primary-color);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .toggle-btn:hover:not(.active) {
+    color: var(--gray-800);
+  }
+
+  /* Grid de carpetas limpio */
+  .folders-grid-clean {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+  }
+
+  .folder-card-clean {
+    background-color: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+
+  .folder-card-clean:hover {
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  .folder-icon-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+
+  .folder-icon-clean {
+    width: 48px;
+    height: 48px;
+    background-color: var(--primary-color);
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-size: 20px;
+  }
+
+  .folder-info-clean {
+    margin-bottom: 16px;
+  }
+
+  .folder-name-clean {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0 0 4px 0;
+    line-height: 1.4;
+  }
+
+  .folder-desc-clean {
+    font-size: 14px;
+    color: var(--gray-600);
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .folder-meta-clean {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--gray-600);
+  }
+
+  .meta-item i {
+    width: 14px;
+    font-size: 12px;
+  }
+
+  .text-success {
+    color: var(--success-color) !important;
+  }
+
+  .text-muted {
+    color: var(--gray-400) !important;
+  }
+
+  /* Estilos para archivos en modal */
+  .archivos-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-height: 500px;
+    overflow-y: auto;
+  }
+
+  .archivo-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius);
+    transition: all 0.2s ease;
+  }
+
+  .archivo-item:hover {
+    background: var(--white);
+    border-color: var(--primary-color);
+  }
+
+  .archivo-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+  }
+
+  .archivo-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+  }
+
+  .archivo-details {
+    flex: 1;
+  }
+
+  .archivo-nombre {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin: 0 0 4px 0;
+  }
+
+  .archivo-meta {
+    display: flex;
+    gap: 16px;
+    margin: 0;
+    font-size: 13px;
+    color: var(--gray-500);
+  }
+
+  .archivo-meta span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .archivo-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-archivo-action {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+
+  .btn-descargar {
+    background-color: #f0f9ff;
+    color: #0284c7;
+  }
+
+  .btn-descargar:hover {
+    background-color: #0284c7;
+    color: white;
+  }
+
+  .btn-editar {
+    background-color: #fef3c7;
+    color: #d97706;
+  }
+
+  .btn-editar:hover {
+    background-color: #d97706;
+    color: white;
+  }
+
+  .btn-eliminar {
+    background-color: #fef2f2;
+    color: #dc2626;
+  }
+
+  .btn-eliminar:hover {
+    background-color: #dc2626;
+    color: white;
+  }
+
+  .empty-files-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--gray-500);
+  }
+
+  .empty-files-state i {
+    font-size: 64px;
+    margin-bottom: 16px;
+    color: var(--gray-300);
+  }
+
+  .empty-files-state h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--gray-700);
+  }
+
+  .empty-files-state p {
+    font-size: 16px;
+    margin: 0;
+  }
+
+  /* Colores para diferentes tipos de archivos */
+  .text-purple { color: #8b5cf6; }
+  .text-orange { color: #f97316; }
+
+  /* Estilos adicionales para vista de lista */
+  .folders-list-clean {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+  }
+
+  .list-header-clean {
+    display: grid;
+    grid-template-columns: 2fr 100px 120px 150px 100px;
+    gap: 16px;
+    padding: 16px 20px;
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--gray-700);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .list-row-clean {
+    display: grid;
+    grid-template-columns: 2fr 100px 120px 150px 100px;
+    gap: 16px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--gray-100);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    align-items: center;
+  }
+
+  .list-row-clean:hover {
+    background: var(--gray-50);
+  }
+
+  .list-row-clean:last-child {
+    border-bottom: none;
+  }
+
+  .folder-name-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .folder-icon-small {
+    color: var(--primary-color);
+    font-size: 18px;
+  }
+
+  .name-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .folder-name {
+    font-weight: 600;
+    color: var(--gray-900);
+    font-size: 14px;
+  }
+
+  .folder-desc {
+    font-size: 12px;
+    color: var(--gray-500);
+  }
+
+  .file-count {
+    font-weight: 500;
+    color: var(--gray-700);
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .status-badge.public {
+    background: #dcfce7;
+    color: #166534;
+  }
+
+  .owner-name {
+    font-size: 13px;
+    color: var(--gray-600);
+  }
+
+  .action-btn-clean {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+
+  .action-btn-clean.download {
+    background: #f0f9ff;
+    color: #0284c7;
+  }
+
+  .action-btn-clean.download:hover {
+    background: #0284c7;
+    color: white;
+  }
+
+  /* Estado vacío mejorado */
+  .empty-state-clean {
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--gray-500);
+  }
+
+  .empty-icon-clean {
+    font-size: 64px;
+    margin-bottom: 24px;
+    color: var(--gray-300);
+  }
+
+  .empty-title-clean {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--gray-700);
+  }
+
+  .empty-description-clean {
+    font-size: 16px;
+    margin: 0;
+    max-width: 400px;
+    margin: 0 auto;
+    line-height: 1.5;
+  }
+</style>
+
+<div class="admin-panel">
   <h1 class="titulo-principal">
     <i class="fas fa-user-circle"></i> 
     Bienvenido, {{ request.user.first_name|default:request.user.username }}
@@ -18,7 +569,7 @@
     <div class="periodos-activos-lista">
       {% for periodo in periodos_activos %}
         <div class="periodo-activo-item">
-          <span class="periodo-nombre">{{ periodo.nombre }} - {{ periodo.año }}</span>
+          <span class="periodo-nombre">{{ periodo.nombre }}</span>
           <small class="periodo-admin">(Admin: {{ periodo.administrador.first_name|default:periodo.administrador.username }})</small>
         </div>
       {% endfor %}
@@ -31,1267 +582,603 @@
   </div>
   {% endif %}
 
-  <!-- Sección de Carpetas -->
-  <section class="carpetas-section">
-    <div class="section-header">
-      <h2 class="titulo-seccion">
-        <i class="fas fa-folder-open"></i> 
-        Carpetas Disponibles
-      </h2>
+  <!-- Navegación por pestañas -->
+  <div class="tabs-container">
+    <div class="tabs-nav">
+      <button class="tab-btn active" data-tab="carpetas">
+        <i class="fas fa-folder-open"></i> Carpetas Disponibles
+      </button>
     </div>
+  </div>
 
-    {% if carpetas %}
-    <div class="carpetas-grid">
-      {% for carpeta in carpetas %}
-      <div class="carpeta-card">
-        <div class="carpeta-header">
-          <h3 class="carpeta-titulo">
-            <i class="fas fa-folder"></i>
-            {{ carpeta.nombre }}
-          </h3>
-          {% if carpeta.descripcion %}
-          <p class="carpeta-descripcion">{{ carpeta.descripcion }}</p>
-          {% endif %}
+  <!-- Contenido de las pestañas -->
+  <div class="tab-content">
+    <!-- Pestaña de Carpetas -->
+    <div id="carpetas" class="tab-pane active">
+      <div class="section-header-clean">
+        <div class="header-left">
+          <h2 class="section-title">
+            <i class="fas fa-folder-open"></i>
+            Carpetas Disponibles
+          </h2>
         </div>
-        
-        <div class="carpeta-body">
-          <!-- Estadísticas de la carpeta -->
-          <div class="carpeta-stats">
-            <div class="stat-item">
-              <i class="fas fa-file"></i>
-              <span>{{ carpeta.archivos.count }} archivo{{ carpeta.archivos.count|pluralize:"s" }}</span>
-            </div>
-            {% if carpeta.subcarpetas.all %}
-            <div class="stat-item">
-              <i class="fas fa-folder"></i>
-              <span>{{ carpeta.subcarpetas.count }} subcarpeta{{ carpeta.subcarpetas.count|pluralize:"s" }}</span>
-            </div>
-            {% endif %}
-          </div>
+        <div class="header-actions">
+          <button class="btn-clean secondary" onclick="mostrarModalSubirArchivo()">
+            <i class="fas fa-upload"></i>
+            Subir Archivo
+          </button>
+        </div>
+      </div>
 
-          <div class="archivos-lista">
-            {% if carpeta.archivos.all %}
-              {% for archivo in carpeta.archivos.all %}
-              <div class="archivo-item" data-archivo-id="{{ archivo.id }}">
-                <div class="archivo-info">
-                  <i class="fas fa-file-alt"></i>
-                  <div class="archivo-detalles">
-                    <span class="archivo-nombre">{{ archivo.nombre }}</span>
-                    <small class="archivo-fecha">{{ archivo.fecha_subida|date:"d/m/Y H:i" }}</small>
-                  </div>
-                </div>
-                <div class="archivo-acciones">
-                  <a href="{{ archivo.archivo.url }}" target="_blank" class="btn btn-sm btn-outline-primary" title="Ver archivo">
-                    <i class="fas fa-eye"></i>
-                  </a>
-                  {% if archivo.usuario == request.user %}
-                  <button class="btn btn-sm btn-outline-warning" onclick="editarArchivo({{ archivo.id }})" title="Editar">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <button class="btn btn-sm btn-outline-danger" onclick="eliminarArchivo({{ archivo.id }})" title="Eliminar">
-                    <i class="fas fa-trash-alt"></i>
-                  </button>
-                  {% endif %}
-                </div>
-              </div>
-              {% endfor %}
-            {% else %}
-              <div class="sin-archivos">
-                <div class="empty-icon">
-                  <i class="fas fa-cloud-upload-alt"></i>
-                </div>
-                <h4 class="empty-title">No hay archivos en esta carpeta</h4>
-                <p class="empty-description">¡Sé el primero en subir un archivo!</p>
-                <button class="btn-upload-first" onclick="subirArchivoACarpeta({{ carpeta.id }}, '{{ carpeta.nombre }}')">
-                  <div class="btn-upload-icon">
-                    <i class="fas fa-plus"></i>
-                  </div>
-                  <span class="btn-upload-text">Subir primer archivo</span>
-                </button>
-              </div>
-            {% endif %}
-          </div>
+      <p style="color: var(--gray-600); margin-bottom: 24px;">
+        Accede a las carpetas públicas compartidas por los administradores
+      </p>
 
-          <!-- Subcarpetas -->
-          {% if carpeta.subcarpetas.all %}
-          <div class="subcarpetas-section">
-            <h4 class="subcarpetas-titulo">
-              <i class="fas fa-folder-plus"></i> Subcarpetas
-            </h4>
-            {% for subcarpeta in carpeta.subcarpetas.all %}
-            <div class="subcarpeta-item">
-              <span class="subcarpeta-nombre">
-                <i class="fas fa-folder"></i> {{ subcarpeta.nombre }}
-              </span>
-              <span class="subcarpeta-archivos">
-                {{ subcarpeta.archivos.count }} archivo{{ subcarpeta.archivos.count|pluralize:"s" }}
-              </span>
-            </div>
-            {% endfor %}
+      <!-- Toolbar -->
+      <div class="toolbar-clean">
+        <div class="search-container">
+          <div class="search-input-wrapper">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-input-clean" id="searchFolders" placeholder="Buscar carpetas...">
           </div>
-          {% endif %}
+        </div>
+
+        <div class="view-toggle">
+          <button id="viewGridBtn" class="toggle-btn active" title="Vista de cuadrícula">
+            <i class="fas fa-th-large"></i>
+          </button>
+          <button id="viewListBtn" class="toggle-btn" title="Vista de lista">
+            <i class="fas fa-list"></i>
+          </button>
+        </div>
+      </div>
+
+      {% if carpetas %}
+      <!-- Vista de cuadrícula -->
+      <div id="gridView" class="folders-grid-clean">
+        {% for c in carpetas %}
+      <div class="folder-card-clean" data-folder-name="{{ c.nombre|lower }}" onclick="abrirCarpeta({{ c.id }})">
+        <div class="folder-icon-container">
+          <div class="folder-icon-clean">
+            <i class="fas fa-folder"></i>
+          </div>
+        </div>
+        <div class="folder-info-clean">
+          <h3 class="folder-name-clean">{{ c.nombre }}</h3>
+          <p class="folder-desc-clean">{{ c.descripcion|default:"Sin descripción" }}</p>
+        </div>
+        <div class="folder-meta-clean">
+          <div class="meta-item">
+            <i class="fas fa-file"></i>
+            <span>{{ c.archivos.count }} archivos</span>
+          </div>
+          <div class="meta-item">
+            <i class="fas fa-globe text-success"></i>
+            <span>Pública</span>
+          </div>
         </div>
       </div>
       {% endfor %}
-    </div>
-    {% else %}
-    <div class="empty-state">
-      <i class="fas fa-folder-open"></i>
-      <h3>No hay carpetas disponibles</h3>
-      <p>El administrador aún no ha creado carpetas para el período académico activo.</p>
-    </div>
-    {% endif %}
-  </section>
+      </div>
 
+      <!-- Vista de lista -->
+      <div id="listView" class="folders-list-clean" style="display: none;">
+        <div class="list-header-clean">
+          <div class="col-name">Nombre</div>
+          <div class="col-files">Archivos</div>
+          <div class="col-status">Estado</div>
+          <div class="col-owner">Propietario</div>
+          <div class="col-actions">Acciones</div>
+        </div>
+        
+        {% for c in carpetas %}
+        <div class="list-row-clean" data-folder-name="{{ c.nombre|lower }}" onclick="abrirCarpeta({{ c.id }})">
+          <div class="col-name">
+            <div class="folder-name-row">
+              <i class="fas fa-folder folder-icon-small"></i>
+              <div class="name-info">
+                <span class="folder-name">{{ c.nombre }}</span>
+                <small class="folder-desc">{{ c.descripcion|default:"Sin descripción" }}</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-files">
+            <span class="file-count">{{ c.archivos.count }}</span>
+          </div>
+          <div class="col-status">
+            <span class="status-badge public">
+              <i class="fas fa-globe"></i>
+              Pública
+            </span>
+          </div>
+          <div class="col-owner">
+            <span class="owner-name">{{ c.usuario.first_name|default:c.usuario.username }}</span>
+          </div>
+          <div class="col-actions">
+            <button class="action-btn-clean download" onclick="event.stopPropagation(); descargarCarpeta({{ c.id }}, '{{ c.nombre }}')" title="Descargar">
+              <i class="fas fa-download"></i>
+            </button>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state-clean">
+        <div class="empty-icon-clean">
+          <i class="fas fa-folder-open"></i>
+        </div>
+        <h3 class="empty-title-clean">No hay carpetas disponibles</h3>
+        <p class="empty-description-clean">El administrador aún no ha creado carpetas públicas para el período académico activo.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
 </div>
-
-<!-- Modal personalizado -->
-<div id="modalFondo" class="modal-fondo" style="display: none;"></div>
-<div id="modalCarpeta" class="modal-carpeta" style="display: none;"></div>
 
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<style>
-/* Estilos específicos para el dashboard del usuario */
-.carpetas-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 15px;
-  margin-top: 20px;
-}
-
-.carpeta-card {
-  background: white;
-  border: 1px solid #e8ecef;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  transition: all 0.3s ease;
-  position: relative;
-}
-
-.carpeta-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.12);
-  border-color: #46A29F;
-}
-
-.carpeta-header {
-  background: linear-gradient(135deg, #46A29F 0%, #003366 100%);
-  color: white;
-  padding: 15px 18px;
-  position: relative;
-  overflow: hidden;
-}
-
-.carpeta-header::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 60px;
-  height: 60px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  transform: translate(20px, -20px);
-}
-
-.carpeta-titulo {
-  margin: 0;
-  font-size: 0.95rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  position: relative;
-  z-index: 1;
-}
-
-.carpeta-titulo i {
-  margin-right: 8px;
-  font-size: 1.1rem;
-}
-
-.carpeta-descripcion {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 0.8rem;
-  margin: 5px 0 0 0;
-  position: relative;
-  z-index: 1;
-}
-
-.carpeta-body {
-  padding: 15px 18px;
-}
-
-.carpeta-stats {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  padding: 8px 12px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  border-left: 3px solid #46A29F;
-}
-
-.stat-item {
-  display: flex;
-  align-items: center;
-  font-size: 0.85rem;
-  color: #495057;
-}
-
-.stat-item i {
-  margin-right: 5px;
-  color: #46A29F;
-}
-
-.archivo-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 12px;
-  border: 1px solid #f0f0f0;
-  border-radius: 8px;
-  margin-bottom: 6px;
-  background: #fafbfc;
-  transition: all 0.2s ease;
-}
-
-.archivo-item:hover {
-  background: #f0f8ff;
-  border-color: #46A29F;
-  transform: translateX(3px);
-}
-
-.archivo-info {
-  display: flex;
-  align-items: center;
-  flex: 1;
-  min-width: 0;
-}
-
-.archivo-info i {
-  color: #46A29F;
-  margin-right: 8px;
-  font-size: 0.9rem;
-  flex-shrink: 0;
-}
-
-.archivo-detalles {
-  min-width: 0;
-  flex: 1;
-}
-
-.archivo-nombre {
-  font-weight: 500;
-  color: #333;
-  font-size: 0.85rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-bottom: 2px;
-}
-
-.archivo-fecha {
-  color: #6c757d;
-  font-size: 0.7rem;
-}
-
-.archivo-acciones {
-  display: flex;
-  gap: 3px;
-  flex-shrink: 0;
-}
-
-.archivo-acciones .btn {
-  padding: 4px 8px;
-  font-size: 0.7rem;
-  border-radius: 4px;
-  min-width: auto;
-}
-
-.sin-archivos {
-  text-align: center;
-  padding: 25px 15px;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border-radius: 10px;
-  border: 2px dashed #dee2e6;
-}
-
-.empty-icon {
-  width: 50px;
-  height: 50px;
-  margin: 0 auto 15px;
-  background: linear-gradient(135deg, #46A29F 0%, #003366 100%);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 15px rgba(70, 162, 159, 0.3);
-}
-
-.empty-icon i {
-  font-size: 20px;
-  color: white;
-}
-
-.empty-title {
-  color: #495057;
-  font-size: 0.95rem;
-  font-weight: 600;
-  margin-bottom: 5px;
-}
-
-.empty-description {
-  color: #6c757d;
-  font-size: 0.8rem;
-  margin-bottom: 15px;
-}
-
-.btn-upload-first {
-  background: linear-gradient(135deg, #46A29F 0%, #003366 100%);
-  color: white;
-  border: none;
-  border-radius: 20px;
-  padding: 8px 16px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  box-shadow: 0 3px 10px rgba(70, 162, 159, 0.3);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.btn-upload-first:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(70, 162, 159, 0.4);
-  background: linear-gradient(135deg, #3d8b88 0%, #002244 100%);
-}
-
-.btn-upload-icon {
-  width: 18px;
-  height: 18px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.btn-upload-icon i {
-  font-size: 10px;
-}
-
-/* Subcarpetas compactas */
-.subcarpetas-section {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid #e9ecef;
-}
-
-.subcarpetas-titulo {
-  font-size: 0.8rem;
-  color: #495057;
-  margin-bottom: 8px;
-  font-weight: 600;
-}
-
-.subcarpetas-titulo i {
-  margin-right: 5px;
-  color: #46A29F;
-}
-
-.subcarpeta-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 6px 10px;
-  background: #f8f9fa;
-  border-radius: 6px;
-  margin-bottom: 4px;
-  font-size: 0.8rem;
-}
-
-.subcarpeta-nombre {
-  color: #495057;
-  font-weight: 500;
-}
-
-.subcarpeta-nombre i {
-  margin-right: 5px;
-  color: #46A29F;
-  font-size: 0.75rem;
-}
-
-.subcarpeta-archivos {
-  color: #6c757d;
-  font-size: 0.7rem;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .carpetas-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-  
-  .carpeta-card {
-    margin: 0 5px;
-  }
-  
-  .archivo-nombre {
-    font-size: 0.8rem;
-  }
-  
-  .archivo-acciones .btn {
-    padding: 3px 6px;
-    font-size: 0.65rem;
-  }
-}
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.btn-upload-icon i {
-  font-size: 12px;
-}
-
-.btn-upload-text {
-  font-weight: 600;
-}
-
-/* Modal de subida personalizado */
-.upload-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10000;
-  backdrop-filter: blur(5px);
-}
-
-.upload-modal {
-  background: white;
-  border-radius: 16px;
-  width: 90%;
-  max-width: 450px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-  overflow: hidden;
-  animation: modalSlideIn 0.3s ease-out;
-}
-
-@keyframes modalSlideIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9) translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-.upload-modal-header {
-  background: linear-gradient(135deg, #46A29F 0%, #003366 100%);
-  color: white;
-  padding: 20px;
-  position: relative;
-}
-
-.upload-modal-header h3 {
-  margin: 0;
-  font-size: 1.3rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.upload-folder-name {
-  font-size: 0.9rem;
-  opacity: 0.9;
-  margin-top: 5px;
-  display: block;
-}
-
-.upload-close-btn {
-  position: absolute;
-  top: 15px;
-  right: 20px;
-  background: none;
-  border: none;
-  color: white;
-  font-size: 24px;
-  cursor: pointer;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s;
-}
-
-.upload-close-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.upload-modal-body {
-  padding: 30px;
-}
-
-.upload-drop-zone {
-  border: 3px dashed #dee2e6;
-  border-radius: 12px;
-  padding: 40px 20px;
-  text-align: center;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  background: #f8f9fa;
-}
-
-.upload-drop-zone:hover {
-  border-color: #46A29F;
-  background: #f0f8ff;
-}
-
-.upload-drop-zone.drag-over {
-  border-color: #46A29F;
-  background: linear-gradient(135deg, rgba(70, 162, 159, 0.1) 0%, rgba(0, 51, 102, 0.1) 100%);
-  transform: scale(1.02);
-}
-
-.upload-icon {
-  width: 60px;
-  height: 60px;
-  margin: 0 auto 20px;
-  background: linear-gradient(135deg, #46A29F 0%, #003366 100%);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 15px rgba(70, 162, 159, 0.3);
-}
-
-.upload-icon i {
-  font-size: 24px;
-  color: white;
-}
-
-.upload-main-text {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #495057;
-  margin-bottom: 8px;
-}
-
-.upload-sub-text {
-  color: #6c757d;
-  margin-bottom: 20px;
-  font-size: 0.9rem;
-}
-
-.upload-browse-btn {
-  background: linear-gradient(135deg, #46A29F 0%, #003366 100%);
-  color: white;
-  border: none;
-  border-radius: 25px;
-  padding: 12px 24px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(70, 162, 159, 0.3);
-}
-
-.upload-browse-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(70, 162, 159, 0.4);
-}
-
-.upload-file-info {
-  text-align: center;
-  padding: 20px;
-  background: #f8f9fa;
-  border-radius: 12px;
-  border: 2px solid #e9ecef;
-}
-
-.file-preview {
-  margin-bottom: 20px;
-}
-
-.file-preview i {
-  font-size: 48px;
-  color: #46A29F;
-  margin-bottom: 10px;
-}
-
-.file-name {
-  display: block;
-  font-weight: 600;
-  color: #495057;
-  margin-bottom: 5px;
-  word-break: break-all;
-}
-
-.file-size {
-  display: block;
-  color: #6c757d;
-  font-size: 0.9rem;
-}
-
-.upload-submit-btn {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-  color: white;
-  border: none;
-  border-radius: 25px;
-  padding: 12px 30px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.upload-submit-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
-}
-
-.upload-submit-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.subcarpetas-section {
-  margin-top: 20px;
-  padding-top: 15px;
-  border-top: 1px solid #eee;
-}
-
-.subcarpetas-titulo {
-  font-size: 0.9rem;
-  color: #666;
-  margin-bottom: 10px;
-}
-
-.subcarpeta-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 5px 10px;
-  background: #f8f9fa;
-  border-radius: 4px;
-  margin-bottom: 5px;
-}
-
-.subcarpeta-nombre {
-  color: #495057;
-}
-
-.subcarpeta-archivos {
-  color: #6c757d;
-  font-size: 0.8rem;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: #888;
-}
-
-.empty-state i {
-  font-size: 4rem;
-  color: #ddd;
-  margin-bottom: 20px;
-}
-
-.empty-state h3 {
-  color: #666;
-  margin-bottom: 10px;
-}
-
-.archivo-info-tabla {
-  display: flex;
-  align-items: center;
-}
-
-.archivo-info-tabla i {
-  margin-right: 8px;
-  color: #17a2b8;
-}
-
-.alert {
-  padding: 15px;
-  border-radius: 4px;
-  border: 1px solid transparent;
-}
-
-.alert-info {
-  background-color: #d1ecf1;
-  border-color: #bee5eb;
-  color: #0c5460;
-}
-
-.alert-warning {
-  background-color: #fff3cd;
-  border-color: #ffeaa7;
-  color: #856404;
-}
-
-.badge {
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-}
-
-.badge-info {
-  background-color: #17a2b8;
-  color: white;
-}
-
-/* Estilos para períodos activos */
-.periodos-activos {
-  margin-bottom: 20px;
-}
-
-.periodo-item {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 10px;
-  padding: 15px;
-  margin-bottom: 10px;
-  color: white;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.periodo-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-}
-
-.periodo-nombre {
-  font-size: 1.2em;
-  font-weight: bold;
-  margin-bottom: 5px;
-  display: flex;
-  align-items: center;
-}
-
-.periodo-nombre i {
-  margin-right: 8px;
-}
-
-.periodo-admin {
-  font-size: 0.9em;
-  opacity: 0.9;
-  display: flex;
-  align-items: center;
-}
-
-.periodo-admin i {
-  margin-right: 5px;
-}
-
-.periodo-fechas {
-  font-size: 0.85em;
-  opacity: 0.8;
-  margin-top: 5px;
-  display: flex;
-  align-items: center;
-}
-
-.periodo-fechas i {
-  margin-right: 5px;
-}
-</style>
-
 <script>
-  const modalFondo = document.getElementById('modalFondo');
-  const modalCarpeta = document.getElementById('modalCarpeta');
+// Variables globales
+let carpetaActualId = null;
 
-  function abrirModal(url) {
-    fetch(url)
-      .then(res => res.text())
-      .then(html => {
-        modalCarpeta.innerHTML = html;
-        modalCarpeta.style.display = 'block';
-        modalFondo.style.display = 'block';
+document.addEventListener('DOMContentLoaded', function() {
+  // Inicializar controles de vista
+  const viewGridBtn = document.getElementById('viewGridBtn');
+  const viewListBtn = document.getElementById('viewListBtn');
+  const gridView = document.getElementById('gridView');
+  const listView = document.getElementById('listView');
+  const searchFolders = document.getElementById('searchFolders');
 
-        const form = modalCarpeta.querySelector('form');
-        if (form) {
-          form.addEventListener('submit', e => {
-            e.preventDefault();
-            const formData = new FormData(form);
-            fetch(url, {
-              method: 'POST',
-              headers: {
-                'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value
-              },
-              body: formData
-            })
-            .then(r => r.json())
-            .then(data => {
-              if (data.success) {
-                Swal.fire({
-                  icon: 'success',
-                  title: '¡Éxito!',
-                  text: 'Operación exitosa',
-                  timer: 2000,
-                  showConfirmButton: false
-                });
-                cerrarModal();
-                setTimeout(() => location.reload(), 2000);
-              } else {
-                Swal.fire({
-                  icon: 'error',
-                  title: 'Error de validación',
-                  html: '<pre>' + JSON.stringify(data.errors, null, 2) + '</pre>'
-                });
-              }
-            });
-          });
+  // Cambiar a vista de cuadrícula
+  if (viewGridBtn) {
+    viewGridBtn.addEventListener('click', function() {
+      viewGridBtn.classList.add('active');
+      viewListBtn.classList.remove('active');
+      if (gridView) gridView.style.display = 'grid';
+      if (listView) listView.style.display = 'none';
+    });
+  }
+
+  // Cambiar a vista de lista
+  if (viewListBtn) {
+    viewListBtn.addEventListener('click', function() {
+      viewListBtn.classList.add('active');
+      viewGridBtn.classList.remove('active');
+      if (gridView) gridView.style.display = 'none';
+      if (listView) listView.style.display = 'block';
+    });
+  }
+
+  // Búsqueda de carpetas
+  if (searchFolders) {
+    searchFolders.addEventListener('input', function() {
+      const searchTerm = this.value.toLowerCase();
+      const folderCards = document.querySelectorAll('.folder-card-clean, .list-row-clean');
+      
+      folderCards.forEach(card => {
+        const folderName = card.getAttribute('data-folder-name') || 
+                          card.querySelector('.folder-title-clean, .folder-name')?.textContent.toLowerCase() || '';
+        
+        if (folderName.includes(searchTerm)) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
         }
       });
-  }
-
-  function cerrarModal() {
-    modalCarpeta.style.display = 'none';
-    modalFondo.style.display = 'none';
-    modalCarpeta.innerHTML = '';
-  }
-
-  // Función específica para subir archivo a una carpeta
-  function subirArchivoACarpeta(carpetaId, carpetaNombre) {
-    mostrarModalSubirArchivo(carpetaId, carpetaNombre);
-  }
-
-  // Modal personalizado para subir archivos
-  function mostrarModalSubirArchivo(carpetaId, carpetaNombre) {
-    const modalHTML = `
-      <div id="uploadModal" class="upload-modal-overlay">
-        <div class="upload-modal">
-          <div class="upload-modal-header">
-            <h3><i class="fas fa-cloud-upload-alt"></i> Subir archivo</h3>
-            <span class="upload-folder-name">a "${carpetaNombre}"</span>
-            <button class="upload-close-btn" onclick="cerrarModalUpload()">&times;</button>
-          </div>
-          <div class="upload-modal-body">
-            <div class="upload-drop-zone" id="dropZone">
-              <div class="upload-icon">
-                <i class="fas fa-cloud-upload-alt"></i>
-              </div>
-              <div class="upload-text">
-                <p class="upload-main-text">Arrastra tu archivo aquí</p>
-                <p class="upload-sub-text">o</p>
-                <button type="button" class="upload-browse-btn" onclick="document.getElementById('fileInput').click()">
-                  Seleccionar archivo
-                </button>
-              </div>
-              <input type="file" id="fileInput" style="display: none;" onchange="handleFileSelect(this.files[0], ${carpetaId})">
-            </div>
-            <div class="upload-file-info" id="fileInfo" style="display: none;">
-              <div class="file-preview">
-                <i class="fas fa-file"></i>
-                <span class="file-name"></span>
-                <span class="file-size"></span>
-              </div>
-              <button class="upload-submit-btn" onclick="subirArchivoSeleccionado()">
-                <i class="fas fa-upload"></i> Subir archivo
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-    
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
-    // Configurar drag & drop
-    const dropZone = document.getElementById('dropZone');
-    
-    dropZone.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      dropZone.classList.add('drag-over');
-    });
-    
-    dropZone.addEventListener('dragleave', (e) => {
-      e.preventDefault();
-      dropZone.classList.remove('drag-over');
-    });
-    
-    dropZone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      dropZone.classList.remove('drag-over');
-      const files = e.dataTransfer.files;
-      if (files.length > 0) {
-        handleFileSelect(files[0], carpetaId);
-      }
     });
   }
+});
 
-  let archivoSeleccionado = null;
-  let carpetaDestino = null;
-
-  function handleFileSelect(file, carpetaId) {
-    archivoSeleccionado = file;
-    carpetaDestino = carpetaId;
-    
-    const fileInfo = document.getElementById('fileInfo');
-    const fileName = fileInfo.querySelector('.file-name');
-    const fileSize = fileInfo.querySelector('.file-size');
-    
-    fileName.textContent = file.name;
-    fileSize.textContent = formatFileSize(file.size);
-    
-    document.getElementById('dropZone').style.display = 'none';
-    fileInfo.style.display = 'block';
-  }
-
-  function formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  }
-
-  function subirArchivoSeleccionado() {
-    if (!archivoSeleccionado || !carpetaDestino) return;
-    
-    const formData = new FormData();
-    formData.append('archivo', archivoSeleccionado);
-    formData.append('nombre', archivoSeleccionado.name.split('.')[0]);
-    formData.append('carpeta', carpetaDestino);
-    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
-    
-    // Mostrar loading
-    const submitBtn = document.querySelector('.upload-submit-btn');
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Subiendo...';
-    submitBtn.disabled = true;
-    
-    fetch(`/subir_archivo/${carpetaDestino}/`, {
-      method: 'POST',
-      body: formData
-    })
+// Función para abrir carpeta y mostrar archivos
+function abrirCarpeta(carpetaId) {
+  // Guardar el ID de la carpeta actual
+  window.carpetaActualId = carpetaId;
+  
+  // Mostrar estado de carga
+  const modal = document.getElementById('archivosCarpetaModal');
+  const estadoCarga = document.getElementById('estadoCarga');
+  const estadoVacio = document.getElementById('estadoVacio');
+  const listaArchivos = document.getElementById('listaArchivos');
+  
+  // Mostrar modal y estado de carga
+  const bootstrapModal = new bootstrap.Modal(modal);
+  bootstrapModal.show();
+  
+  estadoCarga.style.display = 'block';
+  estadoVacio.style.display = 'none';
+  listaArchivos.innerHTML = '';
+  
+  // Obtener información de la carpeta y sus archivos
+  fetch(`/obtener_archivos_carpeta/${carpetaId}/`)
     .then(response => response.json())
     .then(data => {
+      estadoCarga.style.display = 'none';
+      
       if (data.success) {
-        cerrarModalUpload();
-        Swal.fire({
-          icon: 'success',
-          title: '¡Archivo subido!',
-          text: 'El archivo se ha subido correctamente',
-          timer: 2000,
-          showConfirmButton: false
-        });
-        setTimeout(() => location.reload(), 2000);
+        mostrarArchivosEnModal(data.carpeta, data.archivos);
       } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudo subir el archivo'
-        });
-        submitBtn.innerHTML = '<i class="fas fa-upload"></i> Subir archivo';
-        submitBtn.disabled = false;
+        Swal.fire('Error', data.error || 'No se pudo cargar la información de la carpeta', 'error');
+        bootstrapModal.hide();
       }
     })
     .catch(error => {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error de red',
-        text: 'No se pudo conectar al servidor'
-      });
-      submitBtn.innerHTML = '<i class="fas fa-upload"></i> Subir archivo';
-      submitBtn.disabled = false;
+      console.error('Error:', error);
+      estadoCarga.style.display = 'none';
+      Swal.fire('Error', 'Error en la conexión', 'error');
+      bootstrapModal.hide();
     });
-  }
+}
 
-  function cerrarModalUpload() {
-    const modal = document.getElementById('uploadModal');
-    if (modal) {
-      modal.remove();
-    }
-    archivoSeleccionado = null;
-    carpetaDestino = null;
+// Función para mostrar archivos en el modal Bootstrap
+function mostrarArchivosEnModal(carpeta, archivos) {
+  // Actualizar información de la carpeta
+  document.getElementById('nombreCarpetaModal').textContent = carpeta.nombre;
+  document.getElementById('descripcionCarpetaModal').textContent = carpeta.descripcion || 'Sin descripción';
+  document.getElementById('totalArchivosModal').textContent = carpeta.total_archivos;
+  
+  const estadoCarpeta = document.getElementById('estadoCarpetaModal');
+  estadoCarpeta.className = `badge ${carpeta.publica ? 'bg-success' : 'bg-secondary'}`;
+  estadoCarpeta.innerHTML = `<i class="fas ${carpeta.publica ? 'fa-globe' : 'fa-lock'} me-1"></i>${carpeta.publica ? 'Pública' : 'Privada'}`;
+  
+  const listaArchivos = document.getElementById('listaArchivos');
+  const estadoVacio = document.getElementById('estadoVacio');
+  
+  if (archivos.length === 0) {
+    listaArchivos.innerHTML = '';
+    estadoVacio.style.display = 'block';
+  } else {
+    estadoVacio.style.display = 'none';
+    
+    const archivosHtml = archivos.map(archivo => `
+      <div class="archivo-item d-flex justify-content-between align-items-center p-3 mb-2 border rounded">
+        <div class="d-flex align-items-center">
+          <div class="archivo-icon me-3">
+            <i class="fas ${getFileIcon(archivo.nombre)} fa-2x"></i>
+          </div>
+          <div class="archivo-details">
+            <h6 class="mb-1">${archivo.nombre}</h6>
+            <small class="text-muted">
+              <i class="fas fa-calendar me-1"></i>${archivo.fecha_subida}
+              <i class="fas fa-hdd ms-3 me-1"></i>${archivo.tamaño}
+              <i class="fas fa-user ms-3 me-1"></i>${archivo.usuario}
+            </small>
+          </div>
+        </div>
+        <div class="archivo-actions">
+          <button class="btn btn-outline-primary btn-sm me-1" onclick="descargarArchivo(${archivo.id})" title="Descargar">
+            <i class="fas fa-download"></i>
+          </button>
+          ${archivo.usuario === '{{ request.user.username }}' ? `
+          <button class="btn btn-outline-warning btn-sm me-1" onclick="editarArchivo(${archivo.id})" title="Editar">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button class="btn btn-outline-danger btn-sm" onclick="eliminarArchivoModal(${archivo.id})" title="Eliminar">
+            <i class="fas fa-trash"></i>
+          </button>
+          ` : ''}
+        </div>
+      </div>
+    `).join('');
+    
+    listaArchivos.innerHTML = archivosHtml;
   }
+}
 
-  // Editar archivo
-  function editarArchivo(id) {
-    // Cargar el contenido del modal sin mostrar loading de SweetAlert
-    fetch(`/editar_archivo/${id}/`)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.text();
-      })
-      .then(html => {
-        // Remover modal existente si existe
-        const existingModal = document.querySelector('#editarArchivoModal');
-        if (existingModal) {
-          existingModal.remove();
-        }
-        
-        // Remover backdrop existente
-        const existingBackdrop = document.querySelector('.modal-backdrop');
-        if (existingBackdrop) {
-          existingBackdrop.remove();
-        }
-        
-        // Agregar el nuevo modal al body
-        document.body.insertAdjacentHTML('beforeend', html);
-        
-        // Obtener el modal recién agregado
-        const modalElement = document.querySelector('#editarArchivoModal');
-        
-        if (modalElement) {
-          let modalInstance = null;
+// Función para obtener el icono según el tipo de archivo
+function getFileIcon(nombreArchivo) {
+  const extension = nombreArchivo.split('.').pop().toLowerCase();
+  const iconMap = {
+    'pdf': 'fa-file-pdf text-danger',
+    'doc': 'fa-file-word text-primary',
+    'docx': 'fa-file-word text-primary',
+    'xls': 'fa-file-excel text-success',
+    'xlsx': 'fa-file-excel text-success',
+    'ppt': 'fa-file-powerpoint text-warning',
+    'pptx': 'fa-file-powerpoint text-warning',
+    'jpg': 'fa-file-image text-info',
+    'jpeg': 'fa-file-image text-info',
+    'png': 'fa-file-image text-info',
+    'gif': 'fa-file-image text-info',
+    'mp4': 'fa-file-video text-purple',
+    'avi': 'fa-file-video text-purple',
+    'mp3': 'fa-file-audio text-orange',
+    'wav': 'fa-file-audio text-orange',
+    'zip': 'fa-file-archive text-secondary',
+    'rar': 'fa-file-archive text-secondary',
+    'txt': 'fa-file-alt text-muted'
+  };
+  return iconMap[extension] || 'fa-file text-muted';
+}
+
+// Funciones para acciones de archivos
+function descargarArchivo(archivoId) {
+  window.open(`/descargar_archivo/${archivoId}/`, '_blank');
+}
+
+function editarArchivo(archivoId) {
+  // Cerrar el modal actual
+  const modalActual = bootstrap.Modal.getInstance(document.getElementById('archivosCarpetaModal'));
+  if (modalActual) {
+    modalActual.hide();
+  }
+  
+  // Cargar el modal de edición de archivo
+  fetch(`/editar_archivo/${archivoId}/`)
+    .then(response => response.text())
+    .then(html => {
+      // Remover modal existente si existe
+      const existingModal = document.querySelector('#editarArchivoModal');
+      if (existingModal) {
+        existingModal.remove();
+      }
+      
+      // Agregar el nuevo modal al body
+      document.body.insertAdjacentHTML('beforeend', html);
+      
+      // Mostrar el modal usando Bootstrap
+      const modalElement = document.querySelector('#editarArchivoModal');
+      const modal = new bootstrap.Modal(modalElement);
+      modal.show();
+      
+      // Manejar el envío del formulario
+      const form = modalElement.querySelector('#editarArchivoForm');
+      if (form) {
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
           
-          // Función para cerrar el modal
-          function cerrarModal() {
-            if (modalInstance && typeof bootstrap !== 'undefined') {
-              modalInstance.hide();
-            } else if (typeof $ !== 'undefined' && $.fn.modal) {
-              $(modalElement).modal('hide');
-            } else {
-              // Fallback manual
-              modalElement.style.display = 'none';
-              modalElement.classList.remove('show');
-              document.body.classList.remove('modal-open');
-              const backdrop = document.querySelector('.modal-backdrop');
-              if (backdrop) backdrop.remove();
-              modalElement.remove();
-            }
-          }
+          const formData = new FormData(form);
           
-          // Inicializar modal según la versión de Bootstrap
-          if (typeof bootstrap !== 'undefined') {
-            // Bootstrap 5
-            modalInstance = new bootstrap.Modal(modalElement, {
-              backdrop: 'static',
-              keyboard: true
-            });
-            modalInstance.show();
-          } else if (typeof $ !== 'undefined' && $.fn.modal) {
-            // Bootstrap 4 con jQuery
-            $(modalElement).modal({
-              backdrop: 'static',
-              keyboard: true
-            });
-            $(modalElement).modal('show');
-          } else {
-            // Fallback manual
-            modalElement.style.display = 'block';
-            modalElement.classList.add('show');
-            document.body.classList.add('modal-open');
-            
-            // Crear backdrop
-            const backdrop = document.createElement('div');
-            backdrop.className = 'modal-backdrop fade show';
-            backdrop.style.zIndex = '9998';
-            document.body.appendChild(backdrop);
-          }
-          
-          // Manejar el envío del formulario
-          const form = modalElement.querySelector('#editarArchivoForm');
-          if (form) {
-            form.addEventListener('submit', function(e) {
-              e.preventDefault();
-              
-              const formData = new FormData(form);
-              
-              // Mostrar loading en el botón
-              const submitBtn = form.querySelector('button[type="submit"]');
-              const originalText = submitBtn.innerHTML;
-              submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
-              submitBtn.disabled = true;
-              
-              fetch(`/editar_archivo/${id}/`, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                  'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                }
-              })
-              .then(response => {
-                if (!response.ok) {
-                  throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-              })
-              .then(data => {
-                if (data.success) {
-                  // Cerrar modal
-                  cerrarModal();
-                  
-                  // Actualizar dinámicamente el nombre del archivo en la interfaz
-                  const archivoElement = document.querySelector(`[data-archivo-id="${id}"]`);
-                  if (archivoElement) {
-                    const nombreElement = archivoElement.querySelector('.archivo-nombre');
-                    if (nombreElement && data.nuevo_nombre) {
-                      nombreElement.textContent = data.nuevo_nombre;
-                    }
-                  }
-                  
-                  // Mostrar mensaje de éxito sin recargar
-                  Swal.fire({
-                    icon: 'success',
-                    title: '¡Archivo editado!',
-                    text: 'El archivo se ha editado correctamente',
-                    timer: 2000,
-                    showConfirmButton: false,
-                    toast: true,
-                    position: 'top-end'
-                  });
-                } else {
-                  submitBtn.innerHTML = originalText;
-                  submitBtn.disabled = false;
-                  
-                  Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: data.error || 'No se pudo editar el archivo'
-                  });
-                }
-              })
-              .catch(error => {
-                console.error('Error:', error);
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-                
-                Swal.fire({
-                  icon: 'error',
-                  title: 'Error de red',
-                  text: 'No se pudo conectar al servidor'
-                });
+          fetch(`/editar_archivo/${archivoId}/`, {
+            method: 'POST',
+            headers: {
+              'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: formData
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              Swal.fire({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: 'Archivo editado correctamente',
+                timer: 2000,
+                showConfirmButton: false
               });
-            });
-          }
-          
-          // Manejar todos los botones de cierre
-          const closeButtons = modalElement.querySelectorAll('[data-bs-dismiss="modal"], [data-dismiss="modal"], .btn-close');
-          closeButtons.forEach(btn => {
-            btn.addEventListener('click', function(e) {
-              e.preventDefault();
-              cerrarModal();
-            });
-          });
-          
-          // Manejar clic en el backdrop
-          modalElement.addEventListener('click', function(e) {
-            if (e.target === modalElement) {
-              cerrarModal();
+              modal.hide();
+              setTimeout(() => location.reload(), 2000);
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: data.error || 'No se pudo editar el archivo'
+              });
             }
-          });
-          
-          // Manejar tecla Escape
-          document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && modalElement.classList.contains('show')) {
-              cerrarModal();
-            }
-          });
-          
-          // Limpiar el modal cuando se cierre (Bootstrap 5)
-          if (typeof bootstrap !== 'undefined') {
-            modalElement.addEventListener('hidden.bs.modal', function() {
-              modalElement.remove();
-              document.body.classList.remove('modal-open');
-              const backdrop = document.querySelector('.modal-backdrop');
-              if (backdrop) backdrop.remove();
-            });
-          }
-          
-          // Para jQuery/Bootstrap 4
-          if (typeof $ !== 'undefined') {
-            $(modalElement).on('hidden.bs.modal', function() {
-              modalElement.remove();
-              document.body.classList.remove('modal-open');
-              const backdrop = document.querySelector('.modal-backdrop');
-              if (backdrop) backdrop.remove();
-            });
-          }
-        } else {
-          throw new Error('Modal element not found in response');
-        }
-      })
-      .catch(error => {
-        console.error('Error al cargar el modal:', error);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudo cargar el formulario de edición'
-        });
-      });
-  }
-
-  // Eliminar archivo
-  function eliminarArchivo(id) {
-    Swal.fire({
-      title: '¿Estás seguro?',
-      text: "Esta acción eliminará el archivo permanentemente",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar',
-      confirmButtonColor: '#dc3545'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        fetch(`/eliminar_archivo/${id}/`, {
-          method: 'POST',
-          headers: {
-            'X-CSRFToken': '{{ csrf_token }}',
-            'Content-Type': 'application/json'
-          }
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            Swal.fire({
-              icon: 'success',
-              title: 'Eliminado',
-              text: 'Archivo eliminado correctamente',
-              timer: 2000,
-              showConfirmButton: false
-            });
-            setTimeout(() => location.reload(), 2000);
-          } else {
+          })
+          .catch(error => {
+            console.error('Error:', error);
             Swal.fire({
               icon: 'error',
               title: 'Error',
-              text: 'No se pudo eliminar el archivo'
+              text: 'Error en la conexión'
             });
-          }
-        })
-        .catch(() => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error de red',
-            text: 'No se pudo conectar al servidor'
           });
         });
       }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo cargar el formulario de edición'
+      });
     });
-  }
+}
 
-  // Cerrar modal si se hace click fuera
-  modalFondo.onclick = cerrarModal;
+function eliminarArchivoModal(archivoId) {
+  Swal.fire({
+    title: '¿Eliminar archivo?',
+    text: "Esta acción no se puede deshacer",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar',
+    confirmButtonColor: '#dc3545'
+  }).then(result => {
+    if (result.isConfirmed) {
+      fetch(`/eliminar_archivo/${archivoId}/`, {
+        method: 'POST',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Archivo eliminado',
+            timer: 2000,
+            showConfirmButton: false
+          });
+          setTimeout(() => location.reload(), 2000);
+        } else {
+          Swal.fire('Error', 'No se pudo eliminar el archivo', 'error');
+        }
+      });
+    }
+  });
+}
+
+function subirArchivoACarpeta(carpetaId) {
+  // Si se llama desde el modal de archivos, usar la carpeta actual
+  if (!carpetaId && window.carpetaActualId) {
+    carpetaId = window.carpetaActualId;
+  }
+  
+  // Cerrar el modal actual si está abierto
+  const modalActual = bootstrap.Modal.getInstance(document.getElementById('archivosCarpetaModal'));
+  if (modalActual) {
+    modalActual.hide();
+  }
+  
+  // Mostrar modal de subir archivo con la carpeta preseleccionada
+  mostrarModalSubirArchivo(carpetaId);
+}
+
+function descargarCarpeta(carpetaId, carpetaNombre) {
+  Swal.fire({
+    title: 'Preparando descarga...',
+    text: 'Por favor espera mientras se prepara el archivo ZIP',
+    allowOutsideClick: false,
+    didOpen: () => {
+      Swal.showLoading();
+    }
+  });
+
+  fetch(`/descargar_carpeta/${carpetaId}/`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Error en la descarga');
+      }
+      return response.blob();
+    })
+    .then(blob => {
+      Swal.close();
+      
+      // Crear URL del blob y descargar
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = `${carpetaNombre}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      Swal.fire({
+        icon: 'success',
+        title: 'Descarga iniciada',
+        text: `El archivo ${carpetaNombre}.zip se está descargando`,
+        timer: 3000,
+        showConfirmButton: false
+      });
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error en la descarga',
+        text: 'No se pudo descargar la carpeta'
+      });
+    });
+}
+
+// Función para mostrar modal de subir archivo
+function mostrarModalSubirArchivo(carpetaPreseleccionada = null) {
+  // Primero cargar las carpetas disponibles (solo públicas para usuarios)
+  fetch('/api/carpetas/')
+    .then(response => response.json())
+    .then(data => {
+      if (data.carpetas) {
+        // Actualizar el select de carpetas en el modal
+        const selectCarpeta = document.querySelector('#subirArchivoModal select[name="carpeta_destino"]');
+        if (selectCarpeta) {
+          selectCarpeta.innerHTML = '<option value="">Seleccionar carpeta...</option>';
+          data.carpetas.forEach(carpeta => {
+            const option = document.createElement('option');
+            option.value = carpeta.id;
+            option.textContent = carpeta.nombre;
+            if (carpetaPreseleccionada && carpeta.id == carpetaPreseleccionada) {
+              option.selected = true;
+            }
+            selectCarpeta.appendChild(option);
+          });
+        }
+      }
+      
+      // Mostrar el modal
+      const modal = new bootstrap.Modal(document.getElementById('subirArchivoModal'));
+      modal.show();
+    })
+    .catch(error => {
+      console.error('Error al cargar carpetas:', error);
+      // Mostrar el modal aunque falle la carga de carpetas
+      const modal = new bootstrap.Modal(document.getElementById('subirArchivoModal'));
+      modal.show();
+    });
+}
 </script>
+
+<!-- Incluir modales Bootstrap -->
+{% include 'modals/subir_archivo.html' %}
+{% include 'modals/editar_archivo.html' %}
+
+<!-- Modal para mostrar archivos de carpeta -->
+<div class="modal fade" id="archivosCarpetaModal" tabindex="-1" aria-labelledby="archivosCarpetaModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="archivosCarpetaModalLabel">
+          <i class="fas fa-folder-open me-2"></i>
+          <span id="nombreCarpetaModal">Archivos de la carpeta</span>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Información de la carpeta -->
+        <div class="carpeta-info mb-4">
+          <div class="row">
+            <div class="col-md-8">
+              <h6 class="text-muted mb-1">Descripción</h6>
+              <p id="descripcionCarpetaModal" class="mb-2">-</p>
+            </div>
+            <div class="col-md-4 text-end">
+              <div class="carpeta-stats">
+                <span class="badge bg-primary me-2">
+                  <i class="fas fa-file me-1"></i>
+                  <span id="totalArchivosModal">0</span> archivos
+                </span>
+                <span class="badge" id="estadoCarpetaModal">
+                  <i class="fas fa-globe me-1"></i>
+                  Pública
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botón para subir archivos -->
+        <div class="mb-3">
+          <button type="button" class="btn btn-success" onclick="subirArchivoACarpeta()">
+            <i class="fas fa-upload me-2"></i>
+            Subir archivo
+          </button>
+        </div>
+
+        <!-- Lista de archivos -->
+        <div id="listaArchivos">
+          <!-- Los archivos se cargarán aquí dinámicamente -->
+        </div>
+
+        <!-- Estado vacío -->
+        <div id="estadoVacio" class="text-center py-5" style="display: none;">
+          <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+          <h5 class="text-muted">Esta carpeta está vacía</h5>
+          <p class="text-muted">Sube archivos para comenzar</p>
+        </div>
+
+        <!-- Estado de carga -->
+        <div id="estadoCarga" class="text-center py-5" style="display: none;">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+          <p class="text-muted mt-2">Cargando archivos...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}

@@ -1,6 +1,481 @@
-<form method="post" id="formEditarUsuario">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Guardar cambios</button>
-  </form>
+<div class="modal fade" id="editarUsuarioModal" tabindex="-1" role="dialog" aria-labelledby="editarUsuarioModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content modern-modal">
+            <div class="modal-header modern-header">
+                <div class="header-content">
+                    <div class="header-icon">
+                        <i class="fas fa-user-edit"></i>
+                    </div>
+                    <div class="header-text">
+                        <h4 class="modal-title">Editar Usuario</h4>
+                        <p class="modal-subtitle">Modifica la información del usuario</p>
+                    </div>
+                </div>
+            </div>
+            
+            <form id="editarUsuarioForm" method="post">
+                <div class="modal-body modern-body">
+                    {% csrf_token %}
+                    <input type="hidden" id="user_id" name="user_id" value="{{ usuario.id }}">
+                    
+                    <div class="form-group">
+                        <label for="username" class="form-label">
+                            <i class="fas fa-user"></i>
+                            Nombre de usuario
+                        </label>
+                        <input type="text" 
+                               class="form-control modern-input" 
+                               id="username" 
+                               name="username" 
+                               value="{{ usuario.username }}"
+                               placeholder="Ingresa el nombre de usuario"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email" class="form-label">
+                            <i class="fas fa-envelope"></i>
+                            Correo electrónico
+                        </label>
+                        <input type="email" 
+                               class="form-control modern-input" 
+                               id="email" 
+                               name="email" 
+                               value="{{ usuario.email }}"
+                               placeholder="usuario@ejemplo.com"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="new_password" class="form-label">
+                            <i class="fas fa-lock"></i>
+                            Nueva contraseña (opcional)
+                        </label>
+                        <input type="password" 
+                               class="form-control modern-input" 
+                               id="new_password" 
+                               name="new_password" 
+                               placeholder="Dejar vacío para mantener la actual">
+                    </div>
+
+                    <div class="form-group">
+                        <div class="toggle-container">
+                            <div class="toggle-info">
+                                <div class="toggle-header">
+                                    <i class="fas fa-user-shield"></i>
+                                    <span>Permisos de administrador</span>
+                                </div>
+                                <p class="toggle-desc">Otorga permisos administrativos al usuario</p>
+                            </div>
+                            <div class="toggle-switch">
+                                <input type="checkbox" 
+                                       id="is_admin" 
+                                       name="is_admin"
+                                       class="toggle-input"
+                                       {% if usuario.is_staff %}checked{% endif %}>
+                                <label for="is_admin" class="toggle-label">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div class="info-content">
+                            <strong>Información:</strong> Los cambios se aplicarán inmediatamente.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer modern-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.modern-modal {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    max-width: 500px;
+}
+
+.modern-header {
+    background: linear-gradient(135deg, #2c5aa0 0%, #46A29F 100%);
+    color: white;
+    padding: 24px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.header-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.header-text .modal-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.modal-subtitle {
+    margin: 4px 0 0 0;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.btn-close-modern {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-close-modern:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.modern-body {
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 8px;
+}
+
+.form-label i {
+    color: #2c5aa0;
+    width: 16px;
+}
+
+.modern-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.modern-input:focus {
+    border-color: #2c5aa0;
+    box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1);
+}
+
+.form-text {
+    font-size: 12px;
+    color: #718096;
+    margin-top: 4px;
+    display: block;
+}
+
+.toggle-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.toggle-info {
+    flex: 1;
+}
+
+.toggle-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.toggle-header i {
+    color: #2c5aa0;
+    font-size: 16px;
+}
+
+.toggle-header span {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.toggle-desc {
+    font-size: 12px;
+    color: #718096;
+    margin: 0;
+}
+
+.toggle-switch {
+    position: relative;
+}
+
+.toggle-input {
+    display: none;
+}
+
+.toggle-label {
+    display: block;
+    width: 44px;
+    height: 24px;
+    background: #cbd5e0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.toggle-slider {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-input:checked + .toggle-label {
+    background: linear-gradient(135deg, #2c5aa0 0%, #46A29F 100%);
+}
+
+.toggle-input:checked + .toggle-label .toggle-slider {
+    transform: translateX(20px);
+}
+
+.info-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px;
+    background: #f0f8ff;
+    border-radius: 8px;
+    border-left: 3px solid #2c5aa0;
+}
+
+.info-icon {
+    width: 28px;
+    height: 28px;
+    background: #2c5aa0;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 13px;
+}
+
+.info-content {
+    font-size: 13px;
+    color: #2d3748;
+}
+
+.modern-footer {
+    padding: 20px 24px;
+    background: #f8f9fa;
+    border: none;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-secondary {
+    background: white;
+    color: #6c757d;
+    border: 2px solid #e2e8f0;
+}
+
+.btn-secondary:hover {
+    background: #f8f9fa;
+    color: #495057;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #2c5aa0 0%, #46A29F 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(44, 90, 160, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .modal-dialog {
+        margin: 10px;
+        max-width: 95%;
+    }
+    
+    .modern-header {
+        padding: 20px;
+    }
+    
+    .modern-body {
+        padding: 20px;
+    }
+    
+    .modern-footer {
+        padding: 16px 20px;
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .toggle-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('editarUsuarioForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            
+            // Validaciones
+            const username = formData.get('username').trim();
+            const email = formData.get('email').trim();
+            const newPassword = formData.get('new_password').trim();
+            
+            if (!username || !email) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'El nombre de usuario y email son obligatorios'
+                });
+                return;
+            }
+            
+            if (newPassword && newPassword.length < 6) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'La nueva contraseña debe tener al menos 6 caracteres'
+                });
+                return;
+            }
+            
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+            submitBtn.disabled = true;
+            
+            const userId = document.getElementById('user_id').value;
+            fetch(`/editar_usuario/${userId}/`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Cerrar modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editarUsuarioModal'));
+                    if (modal) modal.hide();
+                    
+                    // Mostrar éxito y recargar
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Usuario actualizado!',
+                        text: 'Los cambios se han guardado correctamente',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    let errorMsg = 'Error al actualizar el usuario';
+                    if (data.errors) {
+                        errorMsg = Object.values(data.errors).flat().join(', ');
+                    }
+                    throw new Error(errorMsg);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'No se pudo actualizar el usuario. Inténtalo de nuevo.'
+                });
+            })
+            .finally(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            });
+        });
+    }
+});
+</script>
   

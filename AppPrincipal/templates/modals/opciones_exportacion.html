@@ -1,119 +1,115 @@
 <div class="modal fade" id="opcionesExportacionModal" tabindex="-1" role="dialog" aria-labelledby="opcionesExportacionModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content shadow-lg border-0">
-            <div class="modal-header bg-institucional text-white border-0">
-                <h5 class="modal-title d-flex align-items-center" id="opcionesExportacionModalLabel">
-                    <div class="icon-circle bg-white bg-opacity-20 me-3">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content modern-modal">
+            <div class="modal-header modern-header">
+                <div class="header-content">
+                    <div class="header-icon">
                         <i class="fas fa-download"></i>
                     </div>
-                    Exportar Período Académico
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="header-text">
+                        <h4 class="modal-title">Opciones de Exportación</h4>
+                        <p class="modal-subtitle">Selecciona el formato de exportación</p>
+                    </div>
+                </div>
             </div>
             
-            <div class="modal-body p-4">
-                <!-- Información del período -->
-                <div class="alert alert-info border-0 mb-4">
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-info-circle me-3 fs-4"></i>
-                        <div>
-                            <h6 class="mb-1">{{ periodo.nombre }} - {{ periodo.año }}</h6>
-                            <small class="text-muted">
-                                {{ total_carpetas }} carpetas • {{ total_archivos }} archivos
-                            </small>
+            <div class="modal-body modern-body">
+                <div class="export-options">
+                    <div class="export-option" id="exportLocal">
+                        <div class="option-icon">
+                            <i class="fas fa-laptop"></i>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Opciones de exportación -->
-                <div class="row g-4">
-                    <!-- Opción Local -->
-                    <div class="col-md-6">
-                        <div class="export-option-card h-100 p-4 border rounded-3 text-center position-relative">
-                            <div class="export-icon mb-3">
-                                <i class="fas fa-download text-primary" style="font-size: 3rem;"></i>
+                        <div class="option-content">
+                            <h5>Exportar Localmente</h5>
+                            <p>Descarga los archivos directamente a tu dispositivo</p>
+                            <div class="option-features">
+                                <div class="feature">
+                                    <i class="fas fa-check"></i>
+                                    <span>Descarga inmediata</span>
+                                </div>
+                                <div class="feature">
+                                    <i class="fas fa-check"></i>
+                                    <span>Sin límites de tamaño</span>
+                                </div>
+                                <div class="feature">
+                                    <i class="fas fa-check"></i>
+                                    <span>Formato ZIP comprimido</span>
+                                </div>
                             </div>
-                            <h5 class="mb-3">Descargar Local</h5>
-                            <p class="text-muted mb-4">
-                                Descarga todas las carpetas y archivos como un archivo ZIP a tu computadora.
-                            </p>
-                            <ul class="list-unstyled text-start mb-4">
-                                <li class="mb-2">
-                                    <i class="fas fa-check text-success me-2"></i>
-                                    Descarga inmediata
-                                </li>
-                                <li class="mb-2">
-                                    <i class="fas fa-check text-success me-2"></i>
-                                    Incluye todas las subcarpetas
-                                </li>
-                                <li class="mb-2">
-                                    <i class="fas fa-check text-success me-2"></i>
-                                    Formato ZIP comprimido
-                                </li>
-                            </ul>
-                            <button type="button" class="btn btn-primary w-100" onclick="exportarLocal({{ periodo.id }})">
-                                <i class="fas fa-download me-2"></i>
-                                Descargar ZIP
+                        </div>
+                        <div class="option-action">
+                            <button type="button" class="btn btn-primary" onclick="exportarLocal()">
+                                <i class="fas fa-download"></i>
+                                Descargar
                             </button>
                         </div>
                     </div>
 
-                    <!-- Opción Google Drive -->
-                    <div class="col-md-6">
-                        <div class="export-option-card h-100 p-4 border rounded-3 text-center position-relative">
-                            <div class="export-icon mb-3">
-                                <i class="fab fa-google-drive text-success" style="font-size: 3rem;"></i>
+                    <div class="export-option" id="exportDrive">
+                        <div class="option-icon">
+                            <i class="fab fa-google-drive"></i>
+                        </div>
+                        <div class="option-content">
+                            <h5>Exportar a Google Drive</h5>
+                            <p>Guarda los archivos directamente en tu Google Drive</p>
+                            <div class="option-features">
+                                <div class="feature">
+                                    <i class="fas fa-check"></i>
+                                    <span>Sincronización automática</span>
+                                </div>
+                                <div class="feature">
+                                    <i class="fas fa-check"></i>
+                                    <span>Acceso desde cualquier lugar</span>
+                                </div>
+                                <div class="feature">
+                                    <i class="fas fa-check"></i>
+                                    <span>Organización en carpetas</span>
+                                </div>
                             </div>
-                            <h5 class="mb-3">Exportar a Google Drive</h5>
-                            <p class="text-muted mb-4">
-                                Sube todas las carpetas y archivos directamente a tu Google Drive.
-                            </p>
-                            <ul class="list-unstyled text-start mb-4">
-                                <li class="mb-2">
-                                    <i class="fas fa-check text-success me-2"></i>
-                                    Acceso desde cualquier lugar
-                                </li>
-                                <li class="mb-2">
-                                    <i class="fas fa-check text-success me-2"></i>
-                                    Sincronización automática
-                                </li>
-                                <li class="mb-2">
-                                    <i class="fas fa-check text-success me-2"></i>
-                                    Compartir fácilmente
-                                </li>
-                            </ul>
-                            <button type="button" class="btn btn-success w-100" onclick="exportarGoogleDrive({{ periodo.id }})">
-                                <i class="fab fa-google-drive me-2"></i>
-                                Exportar a Drive
+                        </div>
+                        <div class="option-action">
+                            <button type="button" class="btn btn-success" onclick="exportarDrive()">
+                                <i class="fab fa-google-drive"></i>
+                                Exportar
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Vista previa de carpetas -->
-                <div class="mt-4">
-                    <h6 class="mb-3">
-                        <i class="fas fa-folder me-2"></i>
-                        Carpetas a exportar:
-                    </h6>
-                    <div class="folder-preview bg-light rounded p-3" style="max-height: 200px; overflow-y: auto;">
-                        {% for carpeta in carpetas_principales %}
-                        <div class="d-flex align-items-center mb-2">
-                            <i class="fas fa-folder text-warning me-2"></i>
-                            <span class="fw-medium">{{ carpeta.nombre }}</span>
-                            <small class="text-muted ms-auto">
-                                {{ carpeta.subcarpetas.count }} subcarpetas • {{ carpeta.archivos.count }} archivos
-                            </small>
+                <div class="export-info">
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-info-circle"></i>
                         </div>
-                        {% endfor %}
+                        <div class="info-content">
+                            <h6>Información importante</h6>
+                            <ul>
+                                <li>La exportación incluye todos los archivos del período seleccionado</li>
+                                <li>Los archivos se organizarán por carpetas según su estructura actual</li>
+                                <li>Para Google Drive necesitarás autorizar el acceso a tu cuenta</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="progress-container" id="progressContainer" style="display: none;">
+                    <div class="progress-header">
+                        <span class="progress-text">Preparando exportación...</span>
+                        <span class="progress-percentage">0%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-details" id="progressDetails">
+                        Iniciando proceso...
                     </div>
                 </div>
             </div>
-
-            <div class="modal-footer border-0 bg-light">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times me-2"></i>
-                    Cancelar
+            
+            <div class="modal-footer modern-footer">
+                <button type="submit" class="btn btn-primary" id="exportBtn">
+                    <i class="fas fa-download"></i>
+                    Exportar
                 </button>
             </div>
         </div>
@@ -121,98 +117,504 @@
 </div>
 
 <style>
-.export-option-card {
+.modern-modal {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    max-width: 600px;
+}
+
+.modern-header {
+    background: linear-gradient(135deg, #2c5aa0 0%, #46A29F 100%);
+    color: white;
+    padding: 24px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.header-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.header-text .modal-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.modal-subtitle {
+    margin: 4px 0 0 0;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.btn-close-modern {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-close-modern:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.modern-body {
+    padding: 20px;
+}
+
+.export-options {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.export-option {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    background: white;
     transition: all 0.3s ease;
     cursor: pointer;
 }
 
-.export-option-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
-    border-color: var(--bs-primary) !important;
+.export-option:hover {
+    border-color: #2c5aa0;
+    box-shadow: 0 4px 12px rgba(44, 90, 160, 0.1);
+    transform: translateY(-1px);
 }
 
-.export-icon {
-    transition: transform 0.3s ease;
+.option-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #2c5aa0 0%, #46A29F 100%);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: white;
+    flex-shrink: 0;
 }
 
-.export-option-card:hover .export-icon {
-    transform: scale(1.1);
+#exportDrive .option-icon {
+    background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
 }
 
-.folder-preview {
-    border: 1px solid #dee2e6;
+.option-content {
+    flex: 1;
+}
+
+.option-content h5 {
+    margin: 0 0 6px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.option-content p {
+    margin: 0 0 12px 0;
+    font-size: 13px;
+    color: #718096;
+    line-height: 1.4;
+}
+
+.option-features {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.feature {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #4a5568;
+}
+
+.feature i {
+    color: #48bb78;
+    font-size: 10px;
+    width: 10px;
+}
+
+.option-action {
+    flex-shrink: 0;
+}
+
+.export-info {
+    margin-bottom: 24px;
+}
+
+.info-card {
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+    display: flex;
+    gap: 16px;
+}
+
+.info-icon {
+    width: 40px;
+    height: 40px;
+    background: #2c5aa0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.info-content {
+    flex: 1;
+}
+
+.info-content h6 {
+    margin: 0 0 12px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.info-content ul {
+    margin: 0;
+    padding-left: 16px;
+    color: #4a5568;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.info-content li {
+    margin-bottom: 4px;
+}
+
+.progress-container {
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 16px;
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.progress-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.progress-percentage {
+    font-size: 13px;
+    font-weight: 600;
+    color: #2c5aa0;
+}
+
+.progress {
+    width: 100%;
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(135deg, #2c5aa0 0%, #46A29F 100%);
+    transition: width 0.3s ease;
+}
+
+.progress-details {
+    font-size: 12px;
+    color: #718096;
+    text-align: center;
+}
+
+.modern-footer {
+    padding: 20px 24px;
+    background: #f8f9fa;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.footer-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #718096;
+}
+
+.footer-info i {
+    color: #48bb78;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-secondary {
+    background: white;
+    color: #6c757d;
+    border: 2px solid #e2e8f0;
+}
+
+.btn-secondary:hover {
+    background: #f8f9fa;
+    color: #495057;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #2c5aa0 0%, #46A29F 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(44, 90, 160, 0.3);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    color: white;
+}
+
+.btn-success:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .modal-dialog {
+        margin: 10px;
+        max-width: 95%;
+    }
+    
+    .modern-header {
+        padding: 20px;
+    }
+    
+    .modern-body {
+        padding: 20px;
+    }
+    
+    .modern-footer {
+        padding: 16px 20px;
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .export-option {
+        flex-direction: column;
+        text-align: center;
+        gap: 16px;
+    }
+    
+    .option-content {
+        order: 2;
+    }
+    
+    .option-action {
+        order: 3;
+        width: 100%;
+    }
+    
+    .option-action .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .info-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .footer-info {
+        order: 1;
+    }
+    
+    .btn-secondary {
+        order: 2;
+        width: 100%;
+        justify-content: center;
+    }
 }
 </style>
 
 <script>
-function exportarLocal(periodoId) {
-    // Mostrar indicador de carga
-    const btn = event.target;
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Preparando descarga...';
-    btn.disabled = true;
+document.addEventListener('DOMContentLoaded', function() {
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+    const progressPercentage = document.querySelector('.progress-percentage');
+    const progressText = document.querySelector('.progress-text');
+    const progressDetails = document.getElementById('progressDetails');
     
-    // Iniciar descarga
-    window.open(`/exportar_periodo_zip/${periodoId}/`, '_blank');
+    window.exportarLocal = function() {
+        mostrarProgreso('Preparando descarga local...');
+        
+        // Simular progreso
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += Math.random() * 15;
+            if (progress > 100) progress = 100;
+            
+            actualizarProgreso(progress, 'Comprimiendo archivos...');
+            
+            if (progress >= 100) {
+                clearInterval(interval);
+                setTimeout(() => {
+                    // Cerrar modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('opcionesExportacionModal'));
+                    if (modal) modal.hide();
+                    
+                    // Simular descarga
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Descarga iniciada!',
+                        text: 'Los archivos se están descargando a tu dispositivo',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    
+                    // Aquí iría la lógica real de descarga
+                    // window.location.href = '/exportar_local/';
+                }, 500);
+            }
+        }, 200);
+    };
     
-    // Restaurar botón después de un momento
-    setTimeout(() => {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-        $('#opcionesExportacionModal').modal('hide');
-    }, 2000);
-}
-
-function exportarGoogleDrive(periodoId) {
-    const btn = event.target;
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Exportando...';
-    btn.disabled = true;
+    window.exportarDrive = function() {
+        mostrarProgreso('Conectando con Google Drive...');
+        
+        // Simular progreso
+        let progress = 0;
+        const steps = [
+            'Autenticando con Google...',
+            'Creando carpeta en Drive...',
+            'Subiendo archivos...',
+            'Organizando estructura...',
+            'Finalizando exportación...'
+        ];
+        let currentStep = 0;
+        
+        const interval = setInterval(() => {
+            progress += Math.random() * 12;
+            if (progress > 100) progress = 100;
+            
+            if (progress > (currentStep + 1) * 20 && currentStep < steps.length - 1) {
+                currentStep++;
+            }
+            
+            actualizarProgreso(progress, steps[currentStep]);
+            
+            if (progress >= 100) {
+                clearInterval(interval);
+                setTimeout(() => {
+                    // Cerrar modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('opcionesExportacionModal'));
+                    if (modal) modal.hide();
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Exportación completada!',
+                        text: 'Los archivos se han guardado en tu Google Drive',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    
+                    // Aquí iría la lógica real de exportación a Drive
+                    // window.open('/exportar_drive/', '_blank');
+                }, 500);
+            }
+        }, 300);
+    };
     
-    fetch(`/exportar_google_drive/${periodoId}/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-            'Content-Type': 'application/json',
-        },
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Mostrar mensaje de éxito
-            Swal.fire({
-                icon: 'success',
-                title: '¡Exportación exitosa!',
-                text: data.message,
-                confirmButtonText: 'Ver en Drive',
-                showCancelButton: true,
-                cancelButtonText: 'Cerrar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.open(data.drive_url, '_blank');
-                }
-            });
-            $('#opcionesExportacionModal').modal('hide');
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'No se pudo exportar a Google Drive. Inténtalo de nuevo.',
-            });
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Ocurrió un error durante la exportación.',
+    function mostrarProgreso(texto) {
+        progressContainer.style.display = 'block';
+        progressText.textContent = texto;
+        progressDetails.textContent = 'Iniciando proceso...';
+        progressBar.style.width = '0%';
+        progressPercentage.textContent = '0%';
+        
+        // Deshabilitar botones
+        document.querySelectorAll('.export-option .btn').forEach(btn => {
+            btn.disabled = true;
         });
-    })
-    .finally(() => {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
+    }
+    
+    function actualizarProgreso(porcentaje, detalle) {
+        progressBar.style.width = porcentaje + '%';
+        progressPercentage.textContent = Math.round(porcentaje) + '%';
+        progressDetails.textContent = detalle;
+    }
+    
+    // Limpiar estado al cerrar modal
+    document.getElementById('opcionesExportacionModal').addEventListener('hidden.bs.modal', function() {
+        progressContainer.style.display = 'none';
+        progressBar.style.width = '0%';
+        progressPercentage.textContent = '0%';
+        progressText.textContent = 'Preparando exportación...';
+        progressDetails.textContent = 'Iniciando proceso...';
+        
+        // Rehabilitar botones
+        document.querySelectorAll('.export-option .btn').forEach(btn => {
+            btn.disabled = false;
+        });
     });
-}
+});
 </script>

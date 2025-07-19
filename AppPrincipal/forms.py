@@ -16,15 +16,73 @@ class RegistroForm(forms.ModelForm):
             raise forms.ValidationError("La contraseña es obligatoria")
         return pwd
 
+class EditarUsuarioForm(forms.ModelForm):
+    new_password = forms.CharField(widget=forms.PasswordInput, required=False, label="Nueva contraseña (opcional)")
+    is_staff = forms.BooleanField(label="¿Administrador?", required=False)
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'is_staff']
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if not username:
+            raise forms.ValidationError("El nombre de usuario es obligatorio")
+        return username
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if not email:
+            raise forms.ValidationError("El email es obligatorio")
+        return email
+
 class PeriodoAcademicoForm(forms.ModelForm):
     class Meta:
         model = PeriodoAcademico
-        fields = ['nombre', 'periodo', 'año', 'fecha_inicio', 'fecha_fin', 'activo']
+        fields = ['nombre', 'periodo', 'año', 'fecha_inicio', 'fecha_fin', 'descripcion', 'activo']
         widgets = {
             'fecha_inicio': forms.DateInput(attrs={'type': 'date'}),
             'fecha_fin': forms.DateInput(attrs={'type': 'date'}),
             'nombre': forms.TextInput(attrs={'placeholder': 'Ej: Primer Semestre 2024'}),
+            'año': forms.NumberInput(attrs={'placeholder': '2024'}),
         }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Hacer algunos campos opcionales
+        self.fields['fecha_inicio'].required = False
+        self.fields['fecha_fin'].required = False
+        self.fields['descripcion'].required = False
+        self.fields['activo'].required = False
+        
+        # Establecer año actual por defecto
+        from datetime import datetime
+        if not self.instance.pk:  # Solo para nuevos períodos
+            self.fields['año'].initial = datetime.now().year
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        periodo = cleaned_data.get('periodo')
+        año = cleaned_data.get('año')
+        
+        if periodo and año:
+            # Verificar si ya existe un período con la misma combinación
+            existing = PeriodoAcademico.objects.filter(
+                periodo=periodo,
+                año=año
+            )
+            
+            # Si estamos editando, excluir el período actual
+            if self.instance.pk:
+                existing = existing.exclude(pk=self.instance.pk)
+            
+            if existing.exists():
+                raise forms.ValidationError(
+                    f'Ya existe un período "{periodo}" para el año {año}. '
+                    'Por favor, elige una combinación diferente.'
+                )
+        
+        return cleaned_data
 
 class CarpetaForm(forms.ModelForm):
     publica = forms.BooleanField(label="¿Visible para todos los usuarios?", required=False)

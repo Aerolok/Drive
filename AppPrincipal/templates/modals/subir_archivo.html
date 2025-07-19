@@ -1,106 +1,86 @@
 <div class="modal fade" id="subirArchivoModal" tabindex="-1" role="dialog" aria-labelledby="subirArchivoModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content shadow-lg border-0">
-            <div class="modal-header bg-institucional text-white border-0">
-                <h5 class="modal-title d-flex align-items-center" id="subirArchivoModalLabel">
-                    <div class="icon-circle bg-white bg-opacity-20 me-3">
-                        <i class="fas fa-cloud-upload-alt text-white"></i>
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content modern-modal">
+            <div class="modal-header modern-header">
+                <div class="header-content">
+                    <div class="header-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
                     </div>
-                    Subir Archivo
-                    {% if carpeta %}
-                        a "{{ carpeta.nombre }}"
-                    {% endif %}
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="header-text">
+                        <h4 class="modal-title">Subir Archivo</h4>
+                        <p class="modal-subtitle">Añade archivos al sistema</p>
+                    </div>
+                </div>
             </div>
+            
             <form id="subirArchivoForm" method="post" enctype="multipart/form-data">
-                <div class="modal-body p-4">
+                <div class="modal-body modern-body">
                     {% csrf_token %}
                     
-                    {% if periodo_activo %}
-                    <div class="alert-custom mb-4">
-                        <div class="alert-icon">
-                            <i class="fas fa-calendar-alt"></i>
+                    <div class="upload-zone" id="uploadZone">
+                        <div class="upload-content">
+                            <div class="upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <h3>Arrastra archivos aquí</h3>
+                            <p>o haz clic para seleccionar archivos</p>
+                            <input type="file" id="archivo" name="archivo" multiple accept="*/*" style="display: none;">
+                            <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('archivo').click()">
+                                <i class="fas fa-folder-open"></i>
+                                Seleccionar Archivos
+                            </button>
                         </div>
-                        <div class="alert-content">
-                            <strong>Período Académico:</strong> {{ periodo_activo.nombre }} ({{ periodo_activo.año }})
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    <div class="input-group-custom mb-4">
-                        <div class="input-wrapper">
-                            <input type="text" 
-                                   class="form-control-custom" 
-                                   id="{{ form.nombre.id_for_label }}" 
-                                   name="{{ form.nombre.name }}" 
-                                   placeholder=" "
-                                   required>
-                            <label for="{{ form.nombre.id_for_label }}" class="label-custom">
-                                <i class="fas fa-file-signature me-2"></i>Nombre del Archivo
-                            </label>
-                            <div class="input-border"></div>
-                        </div>
-                    </div>
-
-                    <div class="file-upload-area mb-4">
-                        <div class="file-upload-wrapper">
-                            <input type="file" 
-                                   class="file-input" 
-                                   id="{{ form.archivo.id_for_label }}" 
-                                   name="{{ form.archivo.name }}" 
-                                   required>
-                            <label for="{{ form.archivo.id_for_label }}" class="file-upload-label">
-                                <div class="upload-icon">
-                                    <i class="fas fa-cloud-upload-alt"></i>
-                                </div>
-                                <div class="upload-text">
-                                    <span class="upload-title">Seleccionar Archivo</span>
-                                    <span class="upload-subtitle">Haz clic aquí o arrastra tu archivo</span>
-                                </div>
-                            </label>
-                            <div class="file-name-display"></div>
+                        <div class="upload-info">
+                            <div class="info-item">
+                                <i class="fas fa-info-circle"></i>
+                                <span>Tamaño máximo: 100MB</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-file-alt"></i>
+                                <span>Todos los formatos</span>
+                            </div>
                         </div>
                     </div>
 
-                    {% if not carpeta %}
-                    <div class="input-group-custom mb-4">
-                        <div class="input-wrapper">
-                            <select class="form-control-custom" 
-                                    id="{{ form.carpeta.id_for_label }}" 
-                                    name="{{ form.carpeta.name }}" 
-                                    required>
-                                <option value="">Selecciona una carpeta</option>
-                                {% for carpeta_option in carpetas_disponibles %}
-                                    <option value="{{ carpeta_option.id }}">{{ carpeta_option.nombre }}</option>
-                                {% endfor %}
-                            </select>
-                            <label for="{{ form.carpeta.id_for_label }}" class="label-custom">
-                                <i class="fas fa-folder me-2"></i>Carpeta de Destino
-                            </label>
-                            <div class="input-border"></div>
+                    <div class="files-preview" id="filesPreview" style="display: none;">
+                        <div class="preview-header">
+                            <h5><i class="fas fa-list"></i> Archivos seleccionados</h5>
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearFiles()">
+                                <i class="fas fa-trash"></i>
+                                Limpiar
+                            </button>
                         </div>
+                        <div class="files-list" id="filesList"></div>
                     </div>
-                    {% else %}
-                    <input type="hidden" name="carpeta" value="{{ carpeta.id }}">
-                    {% endif %}
 
-                    <div class="alert-custom">
-                        <div class="alert-icon">
-                            <i class="fas fa-info-circle"></i>
+                    <div class="form-group">
+                        <label for="carpeta_destino" class="form-label">
+                            <i class="fas fa-folder"></i>
+                            Carpeta de destino
+                        </label>
+                        <select class="form-control modern-input" id="carpeta_destino" name="carpeta_destino">
+                            <option value="">Seleccionar carpeta...</option>
+                            {% for carpeta in carpetas %}
+                                <option value="{{ carpeta.id }}">{{ carpeta.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="progress-container" id="progressContainer" style="display: none;">
+                        <div class="progress-header">
+                            <span class="progress-text">Subiendo archivos...</span>
+                            <span class="progress-percentage">0%</span>
                         </div>
-                        <div class="alert-content">
-                            <strong>Información:</strong> El archivo se subirá al período académico activo y será visible para otros usuarios si la carpeta es pública.
+                        <div class="progress">
+                            <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%"></div>
                         </div>
                     </div>
                 </div>
                 
-                <div class="modal-footer border-0 bg-light p-4 justify-content-between">
-                    <button type="button" class="btn-custom btn-secondary-custom" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-2"></i>Cancelar
-                    </button>
-                    <button type="submit" class="btn-custom btn-primary-custom">
-                        <i class="fas fa-cloud-upload-alt me-2"></i>Subir Archivo
+                <div class="modal-footer modern-footer">
+                    <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
+                        <i class="fas fa-upload"></i>
+                        Subir Archivos
                     </button>
                 </div>
             </form>
@@ -109,241 +89,768 @@
 </div>
 
 <style>
-/* Colores institucionales */
-.bg-institucional {
-    background: linear-gradient(135deg, #003366 0%, #02385F 100%);
+/* CSS completamente aislado para el modal de subir archivo */
+#subirArchivoModal.modal .modal-dialog .modal-content.modern-modal {
+    border: none !important;
+    border-radius: 16px !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+    overflow: hidden !important;
+    max-width: 650px !important;
+    background: white !important;
 }
 
-.icon-circle {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-header.modern-header {
+    background: linear-gradient(135deg, #2c5aa0 0%, #46A29F 100%) !important;
+    color: white !important;
+    padding: 24px !important;
+    border: none !important;
+    border-bottom: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin: 0 !important;
 }
 
-/* Inputs personalizados */
-.input-group-custom {
-    position: relative;
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-header .header-content {
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+    width: 100% !important;
 }
 
-.input-wrapper {
-    position: relative;
-    margin-bottom: 8px;
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-header .header-icon {
+    width: 48px !important;
+    height: 48px !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+    border-radius: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 20px !important;
+    color: white !important;
 }
 
-.form-control-custom {
-    width: 100%;
-    padding: 16px 12px 8px 12px;
-    border: 2px solid #e9ecef;
-    border-radius: 12px;
-    font-size: 16px;
-    background: #ffffff;
-    transition: all 0.3s ease;
-    outline: none;
-    font-family: inherit;
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-header .header-icon i {
+    font-family: "Font Awesome 5 Free" !important;
+    font-weight: 900 !important;
+    display: inline-block !important;
 }
 
-.form-control-custom:focus {
-    border-color: #46A29F;
-    box-shadow: 0 0 0 3px rgba(70, 162, 159, 0.1);
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-header .header-text .modal-title {
+    margin: 0 !important;
+    font-size: 20px !important;
+    font-weight: 600 !important;
+    color: white !important;
 }
 
-.label-custom {
-    position: absolute;
-    left: 12px;
-    top: 16px;
-    color: #6c757d;
-    font-size: 16px;
-    transition: all 0.3s ease;
-    pointer-events: none;
-    background: white;
-    padding: 0 4px;
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-header .modal-subtitle {
+    margin: 4px 0 0 0 !important;
+    font-size: 14px !important;
+    opacity: 0.9 !important;
+    color: white !important;
 }
 
-.form-control-custom:focus ~ .label-custom,
-.form-control-custom:not(:placeholder-shown) ~ .label-custom,
-.form-control-custom:valid ~ .label-custom {
-    top: -8px;
-    font-size: 12px;
-    color: #46A29F;
-    font-weight: 600;
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body.modern-body {
+    padding: 24px !important;
+    background: white !important;
 }
 
-.input-border {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: linear-gradient(90deg, #46A29F, #003366);
-    transition: width 0.3s ease;
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .form-group {
+    margin-bottom: 20px !important;
 }
 
-.form-control-custom:focus ~ .input-border {
-    width: 100%;
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .form-label {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: #2d3748 !important;
+    margin-bottom: 12px !important;
 }
 
-/* Área de subida de archivos */
-.file-upload-area {
-    position: relative;
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .form-label i {
+    color: #2c5aa0 !important;
+    width: 16px !important;
+    font-family: "Font Awesome 5 Free" !important;
+    font-weight: 900 !important;
+    display: inline-block !important;
 }
 
-.file-upload-wrapper {
-    position: relative;
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .modern-input {
+    width: 100% !important;
+    padding: 12px 16px !important;
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    background: white !important;
+    color: #2d3748 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    outline: none !important;
+    box-sizing: border-box !important;
 }
 
-.file-input {
-    position: absolute;
-    opacity: 0;
-    width: 100%;
-    height: 100%;
-    cursor: pointer;
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .modern-input:focus {
+    border-color: #2c5aa0 !important;
+    box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1) !important;
 }
 
-.file-upload-label {
-    display: flex;
-    align-items: center;
-    padding: 24px;
-    border: 2px dashed #46A29F;
-    border-radius: 12px;
-    background: #f8fffe;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin: 0;
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .upload-zone {
+    border: 3px dashed #cbd5e0 !important;
+    border-radius: 12px !important;
+    padding: 40px 20px !important;
+    text-align: center !important;
+    background: #f8f9fa !important;
+    transition: all 0.3s ease !important;
+    cursor: pointer !important;
+    position: relative !important;
+    overflow: hidden !important;
+    margin-bottom: 20px !important;
 }
 
-.file-upload-label:hover {
-    background: #e8f4f8;
-    border-color: #003366;
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .upload-zone:hover,
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .upload-zone.dragover {
+    border-color: #2c5aa0 !important;
+    background: #f0f8ff !important;
 }
 
-.upload-icon {
-    width: 60px;
-    height: 60px;
-    background: linear-gradient(135deg, #46A29F 0%, #003366 100%);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 20px;
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .upload-zone .upload-icon {
+    width: 60px !important;
+    height: 60px !important;
+    background: linear-gradient(135deg, #2c5aa0 0%, #46A29F 100%) !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 auto 16px !important;
+    font-size: 24px !important;
+    color: white !important;
 }
 
-.upload-icon i {
-    font-size: 24px;
-    color: white;
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .upload-zone .upload-icon i {
+    font-family: "Font Awesome 5 Free" !important;
+    font-weight: 900 !important;
+    display: inline-block !important;
 }
 
-.upload-text {
-    display: flex;
-    flex-direction: column;
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .upload-zone h3 {
+    font-size: 18px !important;
+    font-weight: 600 !important;
+    color: #2d3748 !important;
+    margin-bottom: 8px !important;
 }
 
-.upload-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: #003366;
-    margin-bottom: 4px;
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .upload-zone p {
+    font-size: 14px !important;
+    color: #718096 !important;
+    margin-bottom: 16px !important;
 }
 
-.upload-subtitle {
-    font-size: 14px;
-    color: #6c757d;
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .upload-info {
+    display: flex !important;
+    justify-content: center !important;
+    gap: 20px !important;
+    margin-top: 16px !important;
 }
 
-.file-name-display {
-    margin-top: 10px;
-    padding: 8px 12px;
-    background: #e8f4f8;
-    border-radius: 6px;
-    color: #003366;
-    font-weight: 500;
-    display: none;
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .info-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    font-size: 12px !important;
+    color: #718096 !important;
 }
 
-/* Alert personalizado */
-.alert-custom {
-    background: #e8f4f8;
-    border: 1px solid #46A29F;
-    border-radius: 12px;
-    padding: 16px;
-    display: flex;
-    align-items: flex-start;
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .info-item i {
+    color: #2c5aa0 !important;
+    font-family: "Font Awesome 5 Free" !important;
+    font-weight: 900 !important;
+    display: inline-block !important;
 }
 
-.alert-icon {
-    color: #46A29F;
-    margin-right: 12px;
-    font-size: 18px;
-    margin-top: 2px;
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .files-preview {
+    margin-bottom: 20px !important;
+    padding: 16px !important;
+    background: #f8f9fa !important;
+    border-radius: 8px !important;
+    border: 2px solid #e2e8f0 !important;
+    max-height: 200px !important;
+    overflow-y: auto !important;
 }
 
-.alert-content {
-    flex: 1;
-    color: #003366;
-    font-size: 14px;
-    line-height: 1.5;
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .preview-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin-bottom: 12px !important;
 }
 
-/* Botones personalizados */
-.btn-custom {
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: 600;
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .preview-header h5 {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin: 0 !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    color: #2d3748 !important;
 }
 
-.btn-primary-custom {
-    background: linear-gradient(135deg, #46A29F 0%, #003366 100%);
-    color: white;
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .files-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
 }
 
-.btn-primary-custom:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(70, 162, 159, 0.3);
-    color: white;
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .file-item {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 12px !important;
+    background: white !important;
+    border-radius: 8px !important;
+    border: 2px solid #e2e8f0 !important;
 }
 
-.btn-secondary-custom {
-    background: #6c757d;
-    color: white;
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .file-info {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    flex: 1 !important;
 }
 
-.btn-secondary-custom:hover {
-    background: #5a6268;
-    color: white;
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .file-icon {
+    width: 32px !important;
+    height: 32px !important;
+    background: linear-gradient(135deg, #2c5aa0 0%, #46A29F 100%) !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: white !important;
+    font-size: 14px !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .file-details {
+    flex: 1 !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .file-name {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: #2d3748 !important;
+    margin-bottom: 2px !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .file-size {
+    font-size: 12px !important;
+    color: #718096 !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .file-remove {
+    background: #fee !important;
+    border: 2px solid #fecaca !important;
+    border-radius: 6px !important;
+    width: 28px !important;
+    height: 28px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #dc2626 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    font-size: 12px !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .file-remove:hover {
+    background: #fecaca !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .toggle-container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 16px !important;
+    background: #f8f9fa !important;
+    border-radius: 8px !important;
+    border: 2px solid #e2e8f0 !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .toggle-info {
+    flex: 1 !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .toggle-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin-bottom: 4px !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .toggle-header i {
+    color: #2c5aa0 !important;
+    font-size: 16px !important;
+    font-family: "Font Awesome 5 Free" !important;
+    font-weight: 900 !important;
+    display: inline-block !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .toggle-header span {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    color: #2d3748 !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .toggle-switch {
+    position: relative !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .toggle-input {
+    display: none !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .toggle-label {
+    display: block !important;
+    width: 50px !important;
+    height: 28px !important;
+    background: #cbd5e0 !important;
+    border-radius: 14px !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    position: relative !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .toggle-slider {
+    position: absolute !important;
+    top: 2px !important;
+    left: 2px !important;
+    width: 24px !important;
+    height: 24px !important;
+    background: white !important;
+    border-radius: 50% !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .toggle-input:checked + .toggle-label {
+    background: linear-gradient(135deg, #2c5aa0 0%, #46A29F 100%) !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .toggle-input:checked + .toggle-label .toggle-slider {
+    transform: translateX(22px) !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .progress-container {
+    margin-top: 20px !important;
+    padding: 20px !important;
+    background: #f8f9fa !important;
+    border-radius: 12px !important;
+    border: 2px solid #e2e8f0 !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .progress-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin-bottom: 12px !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .progress-text {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: #2d3748 !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .progress-percentage {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: #2c5aa0 !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .progress {
+    width: 100% !important;
+    height: 8px !important;
+    background: #e2e8f0 !important;
+    border-radius: 4px !important;
+    overflow: hidden !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-body .progress-bar {
+    height: 100% !important;
+    background: linear-gradient(135deg, #2c5aa0 0%, #46A29F 100%) !important;
+    transition: width 0.3s ease !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-footer.modern-footer {
+    padding: 20px 24px !important;
+    background: #f8f9fa !important;
+    border: none !important;
+    border-top: 1px solid #e2e8f0 !important;
+    display: flex !important;
+    gap: 12px !important;
+    justify-content: flex-end !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-footer .btn {
+    padding: 12px 24px !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    text-decoration: none !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-footer .btn i {
+    font-family: "Font Awesome 5 Free" !important;
+    font-weight: 900 !important;
+    display: inline-block !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-footer .btn-outline-primary {
+    background: white !important;
+    color: #2c5aa0 !important;
+    border: 2px solid #2c5aa0 !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-footer .btn-outline-primary:hover {
+    background: #2c5aa0 !important;
+    color: white !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-footer .btn-outline-danger {
+    background: white !important;
+    color: #dc2626 !important;
+    border: 2px solid #dc2626 !important;
+    padding: 8px 16px !important;
+    font-size: 12px !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-footer .btn-outline-danger:hover {
+    background: #dc2626 !important;
+    color: white !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-footer .btn-primary {
+    background: linear-gradient(135deg, #2c5aa0 0%, #46A29F 100%) !important;
+    color: white !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-footer .btn-primary:hover:not(:disabled) {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(44, 90, 160, 0.3) !important;
+}
+
+#subirArchivoModal.modal .modal-dialog .modal-content .modal-footer .btn-primary:disabled {
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    #subirArchivoModal.modal .modal-dialog {
+        margin: 10px !important;
+        max-width: 95% !important;
+    }
+    
+    #subirArchivoModal.modal .modal-dialog .modal-content .modal-header.modern-header {
+        padding: 20px !important;
+    }
+    
+    #subirArchivoModal.modal .modal-dialog .modal-content .modal-body.modern-body {
+        padding: 20px !important;
+    }
+    
+    #subirArchivoModal.modal .modal-dialog .modal-content .modal-footer.modern-footer {
+        padding: 16px 20px !important;
+        flex-direction: column !important;
+    }
+    
+    #subirArchivoModal.modal .modal-dialog .modal-content .modal-footer .btn {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+    
+    #subirArchivoModal.modal .modal-dialog .modal-content .modal-body .upload-zone {
+        padding: 30px 15px !important;
+    }
+    
+    #subirArchivoModal.modal .modal-dialog .modal-content .modal-body .upload-info {
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
 }
 </style>
 
 <script>
-// Mostrar nombre del archivo seleccionado
 document.addEventListener('DOMContentLoaded', function() {
-    const fileInput = document.querySelector('.file-input');
-    const fileNameDisplay = document.querySelector('.file-name-display');
-    const uploadLabel = document.querySelector('.file-upload-label');
+    const form = document.getElementById('subirArchivoForm');
+    const uploadZone = document.getElementById('uploadZone');
+    const fileInput = document.getElementById('archivo');
+    const filesPreview = document.getElementById('filesPreview');
+    const filesList = document.getElementById('filesList');
+    const submitBtn = document.getElementById('submitBtn');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+    const progressPercentage = document.querySelector('.progress-percentage');
     
-    if (fileInput) {
-        fileInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                fileNameDisplay.textContent = `Archivo seleccionado: ${file.name}`;
-                fileNameDisplay.style.display = 'block';
-                uploadLabel.style.borderColor = '#46A29F';
-                uploadLabel.style.background = '#e8f4f8';
-            } else {
-                fileNameDisplay.style.display = 'none';
-                uploadLabel.style.borderColor = '#46A29F';
-                uploadLabel.style.background = '#f8fffe';
-            }
+    if (!form) {
+        return;
+    }
+    
+    if (!submitBtn) {
+        return;
+    }
+    
+    let selectedFiles = [];
+    
+    // Drag and drop functionality
+    uploadZone.addEventListener('click', () => fileInput.click());
+    
+    uploadZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadZone.classList.add('dragover');
+    });
+    
+    uploadZone.addEventListener('dragleave', () => {
+        uploadZone.classList.remove('dragover');
+    });
+    
+    uploadZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadZone.classList.remove('dragover');
+        handleFiles(e.dataTransfer.files);
+    });
+    
+    fileInput.addEventListener('change', (e) => {
+        handleFiles(e.target.files);
+    });
+    
+    // Event listener para el select de carpeta
+    document.getElementById('carpeta_destino').addEventListener('change', updateSubmitButton);
+    
+    function handleFiles(files) {
+        selectedFiles = Array.from(files);
+        displayFiles();
+        updateSubmitButton();
+    }
+    
+    function displayFiles() {
+        if (selectedFiles.length === 0) {
+            filesPreview.style.display = 'none';
+            return;
+        }
+        
+        filesPreview.style.display = 'block';
+        filesList.innerHTML = '';
+        
+        selectedFiles.forEach((file, index) => {
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            
+            const fileIcon = getFileIcon(file.name);
+            const fileSize = formatFileSize(file.size);
+            
+            fileItem.innerHTML = `
+                <div class="file-info">
+                    <div class="file-icon">
+                        <i class="${fileIcon}"></i>
+                    </div>
+                    <div class="file-details">
+                        <div class="file-name">${file.name}</div>
+                        <div class="file-size">${fileSize}</div>
+                    </div>
+                </div>
+                <button type="button" class="file-remove" onclick="removeFile(${index})">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            filesList.appendChild(fileItem);
         });
     }
+    
+    window.removeFile = function(index) {
+        selectedFiles.splice(index, 1);
+        displayFiles();
+        updateSubmitButton();
+    };
+    
+    window.clearFiles = function() {
+        selectedFiles = [];
+        fileInput.value = '';
+        displayFiles();
+        updateSubmitButton();
+    };
+    
+    function updateSubmitButton() {
+        const carpetaDestino = document.getElementById('carpeta_destino').value;
+        submitBtn.disabled = selectedFiles.length === 0 || !carpetaDestino;
+    }
+    
+    function getFileIcon(filename) {
+        const extension = filename.split('.').pop().toLowerCase();
+        const iconMap = {
+            'pdf': 'fas fa-file-pdf',
+            'doc': 'fas fa-file-word',
+            'docx': 'fas fa-file-word',
+            'xls': 'fas fa-file-excel',
+            'xlsx': 'fas fa-file-excel',
+            'ppt': 'fas fa-file-powerpoint',
+            'pptx': 'fas fa-file-powerpoint',
+            'jpg': 'fas fa-file-image',
+            'jpeg': 'fas fa-file-image',
+            'png': 'fas fa-file-image',
+            'gif': 'fas fa-file-image',
+            'mp4': 'fas fa-file-video',
+            'avi': 'fas fa-file-video',
+            'mov': 'fas fa-file-video',
+            'mp3': 'fas fa-file-audio',
+            'wav': 'fas fa-file-audio',
+            'zip': 'fas fa-file-archive',
+            'rar': 'fas fa-file-archive',
+            'txt': 'fas fa-file-alt',
+            'html': 'fas fa-file-code',
+            'css': 'fas fa-file-code',
+            'js': 'fas fa-file-code'
+        };
+        
+        return iconMap[extension] || 'fas fa-file';
+    }
+    
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (selectedFiles.length === 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Debes seleccionar al menos un archivo'
+            });
+            return;
+        }
+        
+        const carpetaDestino = document.getElementById('carpeta_destino').value;
+        if (!carpetaDestino) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Debes seleccionar una carpeta de destino'
+            });
+            return;
+        }
+        
+        const formData = new FormData();
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        formData.append('csrfmiddlewaretoken', csrfToken);
+        formData.append('carpeta_destino', carpetaDestino);
+        
+        selectedFiles.forEach((file, index) => {
+        formData.append('archivo', file);
+    });
+        
+        // Mostrar progreso
+        progressContainer.style.display = 'block';
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Subiendo...';
+        
+        const xhr = new XMLHttpRequest();
+        
+        xhr.upload.addEventListener('progress', function(e) {
+            if (e.lengthComputable) {
+                const percentComplete = (e.loaded / e.total) * 100;
+                progressBar.style.width = percentComplete + '%';
+                progressPercentage.textContent = Math.round(percentComplete) + '%';
+            }
+        });
+        
+        xhr.addEventListener('load', function() {
+            if (xhr.status === 200) {
+                try {
+                    if (!xhr.responseText.trim()) {
+                        throw new Error('Respuesta vacía del servidor');
+                    }
+                    
+                    const response = JSON.parse(xhr.responseText);
+                    
+                    if (response.success) {
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('subirArchivoModal'));
+                        if (modal) modal.hide();
+                        
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Archivos subidos!',
+                            text: response.message || `Se han subido ${selectedFiles.length} archivo(s) correctamente`,
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                        
+                        setTimeout(() => location.reload(), 2000);
+                    } else {
+                        throw new Error(response.message || 'Error al subir archivos');
+                    }
+                } catch (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: `Error al procesar la respuesta del servidor: ${error.message}`
+                    });
+                }
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: `Error de conexión con el servidor (${xhr.status})`
+                });
+            }
+        });
+        
+        xhr.addEventListener('error', function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error de conexión. Inténtalo de nuevo.'
+            });
+        });
+        
+        xhr.addEventListener('loadend', function() {
+            progressContainer.style.display = 'none';
+            progressBar.style.width = '0%';
+            progressPercentage.textContent = '0%';
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-upload"></i> Subir Archivos';
+        });
+        
+        const url = `/subir_archivo/${carpetaDestino}/`;
+        xhr.open('POST', url);
+        xhr.send(formData);
+    });
+    
+    // Limpiar formulario al cerrar modal
+    document.getElementById('subirArchivoModal').addEventListener('hidden.bs.modal', function () {
+        selectedFiles = [];
+        fileInput.value = '';
+        document.getElementById('carpeta_destino').value = '';
+        displayFiles();
+        updateSubmitButton();
+        progressContainer.style.display = 'none';
+        progressBar.style.width = '0%';
+        progressPercentage.textContent = '0%';
+    });
 });
 </script>

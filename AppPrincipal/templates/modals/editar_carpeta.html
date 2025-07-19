@@ -1,85 +1,89 @@
 <div class="modal fade" id="editarCarpetaModal" tabindex="-1" role="dialog" aria-labelledby="editarCarpetaModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content shadow-lg border-0">
-            <div class="modal-header bg-institucional text-white border-0">
-                <h5 class="modal-title d-flex align-items-center" id="editarCarpetaModalLabel">
-                    <div class="icon-circle bg-white bg-opacity-20 me-3">
-                        <i class="fas fa-edit text-white"></i>
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content modern-modal">
+            <div class="modal-header modern-header">
+                <div class="header-content">
+                    <div class="header-icon">
+                        <i class="fas fa-folder-open"></i>
                     </div>
-                    Editar Carpeta
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="header-text">
+                        <h4 class="modal-title">Editar Carpeta</h4>
+                        <p class="modal-subtitle">Modifica la información de la carpeta</p>
+                    </div>
+                </div>
             </div>
+            
             <form id="editarCarpetaForm" method="post">
-                <div class="modal-body p-4">
+                <div class="modal-body modern-body">
                     {% csrf_token %}
+                    <input type="hidden" id="carpeta_id" name="carpeta_id" value="{{ carpeta.id }}">
                     
-                    <div class="input-group-custom mb-4">
-                        <div class="input-wrapper">
-                            <input type="text" 
-                                   class="form-control-custom" 
-                                   id="{{ form.nombre.id_for_label }}" 
-                                   name="{{ form.nombre.name }}" 
-                                   value="{{ form.nombre.value|default:'' }}"
-                                   placeholder=" "
-                                   required>
-                            <label for="{{ form.nombre.id_for_label }}" class="label-custom">
-                                <i class="fas fa-folder me-2"></i>Nombre de la Carpeta
-                            </label>
-                            <div class="input-border"></div>
-                        </div>
-                    </div>
-
-                    <div class="input-group-custom mb-4">
-                        <div class="input-wrapper">
-                            <textarea class="form-control-custom textarea-custom" 
-                                      id="{{ form.descripcion.id_for_label }}" 
-                                      name="{{ form.descripcion.name }}" 
-                                      placeholder=" "
-                                      rows="3">{{ form.descripcion.value|default:'' }}</textarea>
-                            <label for="{{ form.descripcion.id_for_label }}" class="label-custom">
-                                <i class="fas fa-align-left me-2"></i>Descripción
-                            </label>
-                            <div class="input-border"></div>
-                        </div>
-                    </div>
-
-                    <div class="checkbox-custom mb-4">
-                        <div class="checkbox-wrapper">
-                            <input class="checkbox-input" 
-                                   type="checkbox" 
-                                   id="{{ form.publica.id_for_label }}" 
-                                   name="{{ form.publica.name }}"
-                                   {% if form.publica.value %}checked{% endif %}>
-                            <label class="checkbox-label" for="{{ form.publica.id_for_label }}">
-                                <span class="checkbox-custom-box">
-                                    <i class="fas fa-check"></i>
-                                </span>
-                                <div class="checkbox-text">
-                                    <span class="checkbox-title">
-                                        <i class="fas fa-globe me-2"></i>Carpeta Pública
-                                    </span>
-                                    <span class="checkbox-description">
-                                        Si está marcada, otros usuarios podrán ver esta carpeta
-                                    </span>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="alert-custom">
-                        <div class="alert-icon">
+                    <div class="form-group">
+                        <label for="nombre" class="form-label">
+                            <i class="fas fa-tag"></i>
+                            Nombre de la carpeta
+                        </label>
+                        <input type="text" 
+                               class="form-control modern-input" 
+                               id="nombre" 
+                               name="nombre" 
+                               value="{{ carpeta.nombre }}"
+                               placeholder="Ej: Documentos importantes"
+                               required>
+                        <div class="input-help">
                             <i class="fas fa-info-circle"></i>
+                            No se permiten caracteres especiales como / \ : * ? " < > |
                         </div>
-                        <div class="alert-content">
-                            <strong>Información:</strong> Los cambios se aplicarán inmediatamente después de guardar.
+                    </div>
+
+                    <div class="form-group">
+                        <label for="descripcion" class="form-label">
+                            <i class="fas fa-align-left"></i>
+                            Descripción
+                        </label>
+                        <textarea class="form-control modern-input" 
+                                  id="descripcion" 
+                                  name="descripcion" 
+                                  rows="3"
+                                  placeholder="Describe el contenido de esta carpeta (opcional)">{{ carpeta.descripcion }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="toggle-container">
+                            <div class="toggle-info">
+                                <div class="toggle-header">
+                                    <i class="fas fa-globe"></i>
+                                    <span>Carpeta pública</span>
+                                </div>
+                                <p class="toggle-desc">Permitir acceso a todos los usuarios</p>
+                            </div>
+                            <div class="toggle-switch">
+                                <input type="checkbox" 
+                                       id="publica" 
+                                       name="publica"
+                                       class="toggle-input"
+                                       {% if carpeta.publica %}checked{% endif %}>
+                                <label for="publica" class="toggle-label">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <div class="info-content">
+                            <strong>Consejo:</strong> Las carpetas públicas son visibles para todos los usuarios del sistema.
                         </div>
                     </div>
                 </div>
                 
-                <div class="modal-footer border-0 bg-light p-4 justify-content-end">
-                    <button type="submit" class="btn-custom btn-primary-custom">
-                        <i class="fas fa-save me-2"></i>Guardar Cambios
+                <div class="modal-footer modern-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        Guardar Cambios
                     </button>
                 </div>
             </form>
@@ -88,246 +92,481 @@
 </div>
 
 <style>
-/* Colores institucionales */
-.bg-institucional {
-    background: linear-gradient(135deg, #003366 0%, #02385F 100%);
+/* CSS ULTRA-ESPECÍFICO Y AISLADO PARA MODAL EDITAR CARPETA */
+/* Reseteo completo y aislamiento total */
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content,
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content * {
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    outline: none !important;
+    text-decoration: none !important;
+    list-style: none !important;
+    background: transparent !important;
+    color: inherit !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    font-size: 14px !important;
+    font-weight: normal !important;
+    line-height: 1.5 !important;
 }
 
-.icon-circle {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+/* Modal principal */
+div#editarCarpetaModal.modal.fade {
+    z-index: 9999 !important;
 }
 
-/* Inputs personalizados */
-.input-group-custom {
-    position: relative;
+div#editarCarpetaModal.modal.fade .modal-dialog {
+    max-width: 550px !important;
+    margin: 1.75rem auto !important;
+    position: relative !important;
+    width: auto !important;
+    pointer-events: none !important;
 }
 
-.input-wrapper {
-    position: relative;
-    margin-bottom: 8px;
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content {
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    pointer-events: auto !important;
+    background: #ffffff !important;
+    border: none !important;
+    border-radius: 16px !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+    overflow: hidden !important;
 }
 
-.form-control-custom {
-    width: 100%;
-    padding: 16px 12px 8px 12px;
-    border: 2px solid #e9ecef;
-    border-radius: 12px;
-    font-size: 16px;
-    background: #ffffff;
-    transition: all 0.3s ease;
-    outline: none;
-    font-family: inherit;
+/* Header del modal */
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 24px !important;
+    background: linear-gradient(135deg, #2c5aa0 0%, #46A29F 100%) !important;
+    border-bottom: none !important;
 }
 
-.textarea-custom {
-    resize: vertical;
-    min-height: 80px;
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-header .header-content {
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+    width: 100% !important;
 }
 
-.form-control-custom:focus {
-    border-color: #46A29F;
-    box-shadow: 0 0 0 3px rgba(70, 162, 159, 0.1);
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-header .header-icon {
+    width: 48px !important;
+    height: 48px !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+    border-radius: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 20px !important;
+    color: #ffffff !important;
 }
 
-.label-custom {
-    position: absolute;
-    left: 12px;
-    top: 16px;
-    color: #6c757d;
-    font-size: 16px;
-    transition: all 0.3s ease;
-    pointer-events: none;
-    background: white;
-    padding: 0 4px;
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-header .header-icon i {
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 900 !important;
+    display: inline-block !important;
 }
 
-.form-control-custom:focus ~ .label-custom,
-.form-control-custom:not(:placeholder-shown) ~ .label-custom {
-    top: -8px;
-    font-size: 12px;
-    color: #46A29F;
-    font-weight: 600;
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-header .header-text h4 {
+    margin: 0 !important;
+    font-size: 20px !important;
+    font-weight: 600 !important;
+    color: #ffffff !important;
 }
 
-.input-border {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: linear-gradient(90deg, #46A29F, #003366);
-    transition: width 0.3s ease;
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-header .modal-subtitle {
+    margin: 4px 0 0 0 !important;
+    font-size: 14px !important;
+    opacity: 0.9 !important;
+    color: #ffffff !important;
 }
 
-.form-control-custom:focus ~ .input-border {
-    width: 100%;
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-header .btn-close {
+    background: none !important;
+    border: none !important;
+    color: #ffffff !important;
+    font-size: 24px !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+    width: 32px !important;
+    height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 6px !important;
+    transition: background-color 0.2s ease !important;
 }
 
-/* Checkbox personalizado */
-.checkbox-custom {
-    margin: 20px 0;
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-header .btn-close:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
 }
 
-.checkbox-wrapper {
-    position: relative;
+/* Body del modal */
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-body {
+    padding: 20px !important;
+    background: #ffffff !important;
 }
 
-.checkbox-input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-body .form-group {
+    margin-bottom: 16px !important;
 }
 
-.checkbox-label {
-    display: flex;
-    align-items: flex-start;
-    cursor: pointer;
-    padding: 16px;
-    border: 2px solid #e9ecef;
-    border-radius: 12px;
-    background: #ffffff;
-    transition: all 0.3s ease;
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-body .form-label {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: #2d3748 !important;
+    margin-bottom: 8px !important;
 }
 
-.checkbox-label:hover {
-    border-color: #46A29F;
-    background: #f8fffe;
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-body .form-label i {
+    color: #2c5aa0 !important;
+    width: 16px !important;
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 900 !important;
+    display: inline-block !important;
 }
 
-.checkbox-input:checked + .checkbox-label {
-    border-color: #46A29F;
-    background: linear-gradient(135deg, #f8fffe 0%, #f0fffe 100%);
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-body input.form-control,
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-body textarea.form-control {
+    width: 100% !important;
+    padding: 10px 14px !important;
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    transition: all 0.2s ease !important;
+    outline: none !important;
+    resize: vertical !important;
+    background: #ffffff !important;
+    color: #2d3748 !important;
+    box-sizing: border-box !important;
 }
 
-.checkbox-custom-box {
-    width: 24px;
-    height: 24px;
-    border: 2px solid #dee2e6;
-    border-radius: 6px;
-    margin-right: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: white;
-    transition: all 0.3s ease;
-    flex-shrink: 0;
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-body input.form-control:focus,
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-body textarea.form-control:focus {
+    border-color: #2c5aa0 !important;
+    box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1) !important;
 }
 
-.checkbox-input:checked + .checkbox-label .checkbox-custom-box {
-    background: #46A29F;
-    border-color: #46A29F;
-    color: white;
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-body .input-help {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin-top: 4px !important;
+    font-size: 12px !important;
+    color: #718096 !important;
 }
 
-.checkbox-custom-box i {
-    font-size: 12px;
-    opacity: 0;
-    transition: opacity 0.3s ease;
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-body .input-help i {
+    color: #2c5aa0 !important;
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 900 !important;
+    display: inline-block !important;
 }
 
-.checkbox-input:checked + .checkbox-label .checkbox-custom-box i {
-    opacity: 1;
+/* Toggle switch */
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-body .toggle-container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 12px 16px !important;
+    background: #f8f9fa !important;
+    border-radius: 8px !important;
+    border: 1px solid #e2e8f0 !important;
 }
 
-.checkbox-text {
-    flex: 1;
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-body .toggle-info {
+    flex: 1 !important;
 }
 
-.checkbox-title {
-    display: block;
-    font-weight: 600;
-    color: #003366;
-    margin-bottom: 4px;
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-body .toggle-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin-bottom: 4px !important;
 }
 
-.checkbox-description {
-    display: block;
-    font-size: 14px;
-    color: #6c757d;
-    line-height: 1.4;
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-body .toggle-header i {
+    color: #2c5aa0 !important;
+    font-size: 14px !important;
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 900 !important;
+    display: inline-block !important;
 }
 
-/* Alerta personalizada */
-.alert-custom {
-    display: flex;
-    align-items: center;
-    padding: 16px;
-    background: linear-gradient(135deg, #e8f4fd 0%, #f0f8ff 100%);
-    border: 1px solid #46A29F;
-    border-radius: 12px;
-    margin-top: 20px;
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-body .toggle-header span {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: #2d3748 !important;
 }
 
-.alert-icon {
-    width: 40px;
-    height: 40px;
-    background: #46A29F;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    margin-right: 12px;
-    flex-shrink: 0;
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-body .toggle-desc {
+    font-size: 12px !important;
+    color: #718096 !important;
+    margin: 0 !important;
 }
 
-.alert-content {
-    color: #003366;
-    font-size: 14px;
-    line-height: 1.5;
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-body .toggle-switch {
+    position: relative !important;
 }
 
-.alert-content strong {
-    color: #46A29F;
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-body .toggle-input {
+    display: none !important;
 }
 
-/* Botones personalizados */
-.btn-custom {
-    padding: 12px 24px;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 14px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    text-decoration: none;
-    position: relative;
-    overflow: hidden;
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-body .toggle-label {
+    display: block !important;
+    width: 44px !important;
+    height: 24px !important;
+    background: #cbd5e0 !important;
+    border-radius: 12px !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    position: relative !important;
 }
 
-.btn-primary-custom {
-    background: linear-gradient(135deg, #46A29F 0%, #003366 100%);
-    color: white;
-    box-shadow: 0 4px 15px rgba(70, 162, 159, 0.3);
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-body .toggle-slider {
+    position: absolute !important;
+    top: 2px !important;
+    left: 2px !important;
+    width: 20px !important;
+    height: 20px !important;
+    background: #ffffff !important;
+    border-radius: 50% !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
 }
 
-.btn-primary-custom:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(70, 162, 159, 0.4);
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-body .toggle-input:checked + .toggle-label {
+    background: linear-gradient(135deg, #2c5aa0 0%, #46A29F 100%) !important;
 }
 
-.btn-secondary-custom {
-    background: #f8f9fa;
-    color: #6c757d;
-    border: 2px solid #e9ecef;
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-body .toggle-input:checked + .toggle-label .toggle-slider {
+    transform: translateX(20px) !important;
 }
 
-.btn-secondary-custom:hover {
-    background: #e9ecef;
-    color: #495057;
-    transform: translateY(-1px);
+/* Info card */
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-body .info-card {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 16px !important;
+    background: #f0f8ff !important;
+    border-radius: 8px !important;
+    border: 1px solid #bee3f8 !important;
 }
 
-.modal-content {
-    border-radius: 15px;
-    overflow: hidden;
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-body .info-icon {
+    width: 40px !important;
+    height: 40px !important;
+    background: linear-gradient(135deg, #2c5aa0 0%, #46A29F 100%) !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #ffffff !important;
+    font-size: 16px !important;
+}
+
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-body .info-icon i {
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 900 !important;
+    display: inline-block !important;
+}
+
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-body .info-content {
+    flex: 1 !important;
+    font-size: 13px !important;
+    color: #2d3748 !important;
+}
+
+/* Footer del modal */
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-footer {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 12px !important;
+    padding: 20px !important;
+    background: #f8f9fa !important;
+    border-top: 1px solid #e2e8f0 !important;
+}
+
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-footer .btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 10px 20px !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    border: 2px solid transparent !important;
+    min-width: 120px !important;
+    justify-content: center !important;
+}
+
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-footer .btn i {
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 900 !important;
+    display: inline-block !important;
+}
+
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-footer .btn-secondary {
+    background: #ffffff !important;
+    color: #6b7280 !important;
+    border-color: #d1d5db !important;
+}
+
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-footer .btn-secondary:hover {
+    background: #f9fafb !important;
+    border-color: #9ca3af !important;
+}
+
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-footer .btn-primary {
+    background: linear-gradient(135deg, #2c5aa0 0%, #46A29F 100%) !important;
+    color: #ffffff !important;
+    border-color: transparent !important;
+}
+
+div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-footer .btn-primary:hover {
+    background: linear-gradient(135deg, #1e3a8a 0%, #0891b2 100%) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(44, 90, 160, 0.3) !important;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    div#editarCarpetaModal.modal.fade .modal-dialog {
+        max-width: calc(100% - 2rem) !important;
+        margin: 1rem !important;
+    }
+    
+    div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-header {
+        padding: 16px !important;
+    }
+    
+    div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-body {
+        padding: 16px !important;
+    }
+    
+    div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-footer {
+        padding: 16px !important;
+        flex-direction: column !important;
+    }
+    
+    div#editarCarpetaModal.modal.fade .modal-dialog .modal-content .modal-footer .btn {
+        width: 100% !important;
+    }
 }
 </style>
-  
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('editarCarpetaForm');
+    if (form) {
+        const nombreInput = document.getElementById('nombre');
+        
+        // Validación en tiempo real para caracteres especiales
+        nombreInput.addEventListener('input', function() {
+            const valor = this.value;
+            const caracteresProhibidos = /[\/\\:*?"<>|]/;
+            
+            if (caracteresProhibidos.test(valor)) {
+                this.setCustomValidity('No se permiten caracteres especiales como / \\ : * ? " < > |');
+                this.style.borderColor = '#e53e3e';
+            } else {
+                this.setCustomValidity('');
+                this.style.borderColor = '#e2e8f0';
+            }
+        });
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            
+            // Validaciones
+            const nombre = formData.get('nombre').trim();
+            
+            if (!nombre) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'El nombre de la carpeta es obligatorio'
+                });
+                return;
+            }
+            
+            const caracteresProhibidos = /[\/\\:*?"<>|]/;
+            if (caracteresProhibidos.test(nombre)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'El nombre contiene caracteres no permitidos'
+                });
+                return;
+            }
+            
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+            submitBtn.disabled = true;
+            
+            const carpetaId = document.getElementById('carpeta_id').value;
+            fetch(`/editar_carpeta/${carpetaId}/`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Cerrar modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editarCarpetaModal'));
+                    if (modal) modal.hide();
+                    
+                    // Mostrar éxito y recargar
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Carpeta actualizada!',
+                        text: 'Los cambios se han guardado correctamente',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    let errorMsg = 'Error al actualizar la carpeta';
+                    if (data.errors) {
+                        errorMsg = Object.values(data.errors).flat().join(', ');
+                    }
+                    throw new Error(errorMsg);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'No se pudo actualizar la carpeta. Inténtalo de nuevo.'
+                });
+            })
+            .finally(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            });
+        });
+    }
+});
+</script>

@@ -1,122 +1,545 @@
-<div class="modal-header">
-    <h3><i class="fas fa-folder-plus"></i> Crear Subcarpeta</h3>
-    <button type="button" class="modal-close" onclick="cerrarModal()">&times;</button>
+<div class="modal fade" id="crearSubcarpetaModal" tabindex="-1" role="dialog" aria-labelledby="crearSubcarpetaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content modern-modal">
+            <div class="modal-header modern-header">
+                <div class="header-content">
+                    <div class="header-icon">
+                        <i class="fas fa-folder-plus"></i>
+                    </div>
+                    <div class="header-text">
+                        <h4 class="modal-title">Crear Subcarpeta</h4>
+                        <p class="modal-subtitle">Organiza mejor tu contenido</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close-modern" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="form-crear-subcarpeta" method="post">
+                <div class="modal-body modern-body">
+                    {% csrf_token %}
+                    
+                    <div class="parent-folder-card">
+                        <div class="parent-folder-icon">
+                            <i class="fas fa-folder"></i>
+                        </div>
+                        <div class="parent-folder-info">
+                            <h6 class="parent-folder-name">{{ carpeta_padre.nombre }}</h6>
+                            <p class="parent-folder-desc">{{ carpeta_padre.descripcion|default:"Sin descripción" }}</p>
+                            <span class="parent-label">Carpeta padre</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.nombre.id_for_label }}" class="form-label">
+                            <i class="fas fa-tag"></i>
+                            Nombre de la subcarpeta
+                        </label>
+                        <input type="text" 
+                               class="form-control modern-input" 
+                               id="{{ form.nombre.id_for_label }}" 
+                               name="{{ form.nombre.name }}" 
+                               placeholder="Ej: Documentos importantes"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.descripcion.id_for_label }}" class="form-label">
+                            <i class="fas fa-align-left"></i>
+                            Descripción (Opcional)
+                        </label>
+                        <textarea class="form-control modern-input" 
+                                  id="{{ form.descripcion.id_for_label }}" 
+                                  name="{{ form.descripcion.name }}" 
+                                  rows="3" 
+                                  placeholder="Describe brevemente el contenido de esta subcarpeta..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="toggle-container">
+                            <div class="toggle-info">
+                                <div class="toggle-header">
+                                    <i class="fas fa-globe"></i>
+                                    <span>Subcarpeta Pública</span>
+                                </div>
+                                <p class="toggle-desc">Las subcarpetas públicas pueden ser vistas por todos los usuarios</p>
+                            </div>
+                            <div class="toggle-switch">
+                                <input type="checkbox" 
+                                       id="{{ form.publica.id_for_label }}" 
+                                       name="{{ form.publica.name }}"
+                                       class="toggle-input">
+                                <label for="{{ form.publica.id_for_label }}" class="toggle-label">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <div class="info-content">
+                            <strong>Consejo:</strong> Las subcarpetas heredan los permisos de la carpeta padre por defecto.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer modern-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary btn-beautiful">
+                        <i class="fas fa-folder-plus"></i>
+                        <span>Crear Subcarpeta</span>
+                        <div class="btn-shine"></div>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
-<form id="form-crear-subcarpeta" method="post">
-    {% csrf_token %}
-    <div class="modal-body">
-        <div class="parent-folder-info">
-            <div class="folder-icon">
-                <i class="fas fa-folder"></i>
-            </div>
-            <div class="folder-details">
-                <h4>{{ carpeta_padre.nombre }}</h4>
-                <p>{{ carpeta_padre.descripcion }}</p>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label for="{{ form.nombre.id_for_label }}">
-                <i class="fas fa-tag"></i> Nombre de la Subcarpeta
-            </label>
-            {{ form.nombre }}
-            <small class="form-help">Nombre descriptivo para la subcarpeta</small>
-        </div>
-
-        <div class="form-group">
-            <label for="{{ form.descripcion.id_for_label }}">
-                <i class="fas fa-align-left"></i> Descripción
-            </label>
-            {{ form.descripcion }}
-            <small class="form-help">Descripción opcional de la subcarpeta</small>
-        </div>
-
-        <div class="form-group">
-            <div class="checkbox-group">
-                {{ form.publica }}
-                <label for="{{ form.publica.id_for_label }}">
-                    <i class="fas fa-globe"></i> Hacer pública
-                </label>
-            </div>
-            <small class="form-help">Las subcarpetas públicas pueden ser vistas por todos los usuarios</small>
-        </div>
-    </div>
-
-    <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" onclick="cerrarModal()">
-            <i class="fas fa-times"></i> Cancelar
-        </button>
-        <button type="submit" class="btn btn-primary">
-            <i class="fas fa-save"></i> Crear Subcarpeta
-        </button>
-    </div>
-</form>
-
-<script>
-document.getElementById('form-crear-subcarpeta').onsubmit = function(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(this);
-    
-    fetch('{% url "crear_subcarpeta" carpeta_padre.id %}', {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRFToken': '{{ csrf_token }}'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Subcarpeta creada exitosamente',
-                timer: 2000,
-                showConfirmButton: false
-            });
-            cerrarModal();
-            setTimeout(() => location.reload(), 2000);
-        } else {
-            let errorMsg = 'Error al crear la subcarpeta';
-            if (data.errors) {
-                errorMsg = Object.values(data.errors).flat().join(', ');
-            }
-            Swal.fire('Error', errorMsg, 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        Swal.fire('Error', 'Error de conexión', 'error');
-    });
-};
-</script>
-
 <style>
-.parent-folder-info {
+.modern-modal {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    max-width: 550px;
+}
+
+.modern-header {
+    background: linear-gradient(135deg, #2c5aa0 0%, #46A29F 100%);
+    color: white;
+    padding: 24px;
+    border: none;
     display: flex;
     align-items: center;
-    padding: 15px;
+    justify-content: space-between;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.header-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.header-text .modal-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.modal-subtitle {
+    margin: 4px 0 0 0;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.btn-close-modern {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-close-modern:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.modern-body {
+    padding: 24px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.parent-folder-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
     background: #f8f9fa;
     border-radius: 8px;
+    border: 2px solid #e2e8f0;
     margin-bottom: 20px;
-    border-left: 4px solid #007bff;
 }
 
-.folder-icon {
-    font-size: 2rem;
-    color: #007bff;
-    margin-right: 15px;
+.parent-folder-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #2c5aa0 0%, #46A29F 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
 }
 
-.folder-details h4 {
-    margin: 0 0 5px 0;
-    color: #333;
+.parent-folder-info {
+    flex: 1;
 }
 
-.folder-details p {
+.parent-folder-name {
+    margin: 0 0 4px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.parent-folder-desc {
+    margin: 0 0 4px 0;
+    font-size: 14px;
+    color: #718096;
+}
+
+.parent-label {
+    display: inline-block;
+    padding: 2px 8px;
+    background: #2c5aa0;
+    color: white;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 8px;
+}
+
+.form-label i {
+    color: #2c5aa0;
+    width: 16px;
+}
+
+.modern-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.modern-input:focus {
+    border-color: #2c5aa0;
+    box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1);
+}
+
+.toggle-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 2px solid #e2e8f0;
+}
+
+.toggle-info {
+    flex: 1;
+}
+
+.toggle-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.toggle-header i {
+    color: #2c5aa0;
+    font-size: 16px;
+}
+
+.toggle-header span {
+    font-size: 16px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.toggle-desc {
+    font-size: 13px;
+    color: #718096;
     margin: 0;
-    color: #666;
-    font-size: 0.9rem;
+}
+
+.toggle-switch {
+    position: relative;
+}
+
+.toggle-input {
+    display: none;
+}
+
+.toggle-label {
+    display: block;
+    width: 50px;
+    height: 28px;
+    background: #cbd5e0;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.toggle-slider {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 24px;
+    height: 24px;
+    background: white;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-input:checked + .toggle-label {
+    background: linear-gradient(135deg, #2c5aa0 0%, #46A29F 100%);
+}
+
+.toggle-input:checked + .toggle-label .toggle-slider {
+    transform: translateX(22px);
+}
+
+.info-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: #f0f8ff;
+    border-radius: 8px;
+    border-left: 4px solid #2c5aa0;
+}
+
+.info-icon {
+    width: 32px;
+    height: 32px;
+    background: #2c5aa0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+}
+
+.info-content {
+    font-size: 14px;
+    color: #2d3748;
+}
+
+.modern-footer {
+    padding: 20px 24px;
+    background: #f8f9fa;
+    border: none;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-secondary {
+    background: white;
+    color: #6c757d;
+    border: 2px solid #e2e8f0;
+}
+
+.btn-secondary:hover {
+    background: #f8f9fa;
+    color: #495057;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #2c5aa0 0%, #46A29F 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(44, 90, 160, 0.3);
+}
+
+/* Botón hermoso especial */
+.btn-beautiful {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    transform: perspective(1px) translateZ(0);
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.btn-beautiful:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.6);
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+.btn-beautiful:active {
+    transform: translateY(-1px) scale(0.98);
+}
+
+.btn-shine {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+}
+
+.btn-beautiful:hover .btn-shine {
+    left: 100%;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .modal-dialog {
+        margin: 10px;
+        max-width: 95%;
+    }
+    
+    .modern-header {
+        padding: 20px;
+    }
+    
+    .modern-body {
+        padding: 20px;
+    }
+    
+    .modern-footer {
+        padding: 16px 20px;
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .toggle-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .parent-folder-card {
+        flex-direction: column;
+        text-align: center;
+    }
 }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('form-crear-subcarpeta');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Creando...</span>';
+            submitBtn.disabled = true;
+            
+            fetch(form.action || window.location.href, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Cerrar modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('crearSubcarpetaModal'));
+                    if (modal) modal.hide();
+                    
+                    // Limpiar formulario
+                    form.reset();
+                    
+                    // Mostrar éxito y recargar
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Subcarpeta creada!',
+                        text: 'La subcarpeta se ha creado correctamente',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    let errorMsg = 'Error al crear la subcarpeta';
+                    if (data.errors) {
+                        errorMsg = Object.values(data.errors).flat().join(', ');
+                    }
+                    throw new Error(errorMsg);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'No se pudo crear la subcarpeta. Inténtalo de nuevo.'
+                });
+            })
+            .finally(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            });
+        });
+    }
+});
+</script>

@@ -1,151 +1,621 @@
-<div class="modal-header">
-    <h3><i class="fas fa-calendar-plus"></i> Crear Nuevo Período Académico</h3>
-    <button type="button" class="modal-close" onclick="cerrarModal()">&times;</button>
+<div class="modal fade" id="crearPeriodoModal" tabindex="-1" role="dialog" aria-labelledby="crearPeriodoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content modern-modal">
+            <div class="modal-header modern-header">
+                <div class="header-content">
+                    <div class="header-icon">
+                        <i class="fas fa-calendar-plus"></i>
+                    </div>
+                    <div class="header-text">
+                        <h4 class="modal-title">Nuevo Período</h4>
+                        <p class="modal-subtitle">Crea un nuevo período académico</p>
+                    </div>
+                </div>
+            </div>
+            
+            <form id="crearPeriodoForm" method="post">
+                <div class="modal-body modern-body">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="nombre" class="form-label">
+                            <i class="fas fa-tag"></i>
+                            Nombre del período
+                        </label>
+                        <input type="text" 
+                               class="form-control modern-input" 
+                               id="nombre" 
+                               name="nombre" 
+                               placeholder="Ej: Período 2024-1"
+                               required>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="periodo" class="form-label">
+                                    <i class="fas fa-calendar"></i>
+                                    Período
+                                </label>
+                                <select class="form-control modern-input" 
+                                        id="periodo" 
+                                        name="periodo" 
+                                        required>
+                                    <option value="">Seleccionar período</option>
+                                    <option value="1">Período 1</option>
+                                    <option value="2">Período 2</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="año" class="form-label">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    Año
+                                </label>
+                                <input type="number" 
+                                       class="form-control modern-input" 
+                                       id="año" 
+                                       name="año" 
+                                       placeholder="2024"
+                                       min="2020"
+                                       max="2030"
+                                       required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="descripcion" class="form-label">
+                            <i class="fas fa-align-left"></i>
+                            Descripción
+                        </label>
+                        <textarea class="form-control modern-input" 
+                                  id="descripcion" 
+                                  name="descripcion" 
+                                  rows="3"
+                                  placeholder="Descripción del período académico"></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="fecha_inicio" class="form-label">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    Fecha de inicio
+                                </label>
+                                <input type="date" 
+                                       class="form-control modern-input" 
+                                       id="fecha_inicio" 
+                                       name="fecha_inicio" 
+                                       required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="fecha_fin" class="form-label">
+                                    <i class="fas fa-calendar-check"></i>
+                                    Fecha de fin
+                                </label>
+                                <input type="date" 
+                                       class="form-control modern-input" 
+                                       id="fecha_fin" 
+                                       name="fecha_fin" 
+                                       required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="toggle-container">
+                            <div class="toggle-info">
+                                <div class="toggle-header">
+                                    <i class="fas fa-power-off"></i>
+                                    <span>Período activo</span>
+                                </div>
+                                <p class="toggle-desc">Activar este período para uso inmediato</p>
+                            </div>
+                            <div class="toggle-switch">
+                                <input type="checkbox" 
+                                       id="activo" 
+                                       name="activo"
+                                       class="toggle-input"
+                                       checked>
+                                <label for="activo" class="toggle-label">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div class="info-content">
+                            <strong>Información:</strong> Solo puede haber un período activo a la vez.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer modern-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-calendar-plus"></i>
+                        Crear Período
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
-<form id="form-crear-periodo" method="post">
-    {% csrf_token %}
-    <div class="modal-body">
-        <div class="form-group">
-            <label for="{{ form.nombre.id_for_label }}">
-                <i class="fas fa-tag"></i> Nombre del Período
-            </label>
-            {{ form.nombre }}
-            <small class="form-help">Ej: Primer Semestre, Segundo Semestre</small>
-        </div>
-
-        <div class="form-row">
-            <div class="form-group">
-                <label for="{{ form.periodo.id_for_label }}">
-                    <i class="fas fa-calendar-week"></i> Período
-                </label>
-                {{ form.periodo }}
-            </div>
-            <div class="form-group">
-                <label for="{{ form.año.id_for_label }}">
-                    <i class="fas fa-calendar"></i> Año
-                </label>
-                {{ form.año }}
-            </div>
-        </div>
-
-        <div class="form-row">
-            <div class="form-group">
-                <label for="{{ form.fecha_inicio.id_for_label }}">
-                    <i class="fas fa-calendar-day"></i> Fecha de Inicio
-                </label>
-                {{ form.fecha_inicio }}
-            </div>
-            <div class="form-group">
-                <label for="{{ form.fecha_fin.id_for_label }}">
-                    <i class="fas fa-calendar-day"></i> Fecha de Fin
-                </label>
-                {{ form.fecha_fin }}
-            </div>
-        </div>
-
-        <div class="form-group">
-            <div class="checkbox-group">
-                {{ form.activo }}
-                <label for="{{ form.activo.id_for_label }}">
-                    <i class="fas fa-check-circle"></i> Activar este período
-                </label>
-            </div>
-            <small class="form-help">Si se activa, se desactivarán automáticamente otros períodos</small>
-        </div>
-
-        <div class="form-group">
-            <label for="{{ form.descripcion.id_for_label }}">
-                <i class="fas fa-align-left"></i> Descripción (Opcional)
-            </label>
-            {{ form.descripcion }}
-        </div>
-    </div>
-
-    <div class="modal-footer border-0 bg-light p-4 justify-content-end">
-        <button type="submit" class="btn-custom btn-primary-custom">
-            <i class="fas fa-calendar-plus me-2"></i>Crear Período
-        </button>
-    </div>
-</form>
-
 <style>
-/* Botones personalizados */
-.btn-custom {
-    padding: 12px 24px;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 14px;
+.modern-modal {
     border: none;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    max-width: 600px;
+}
+
+.modern-header {
+    background: linear-gradient(135deg, #2c5aa0 0%, #46A29F 100%);
+    color: white;
+    padding: 24px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.header-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.header-text .modal-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.modal-subtitle {
+    margin: 4px 0 0 0;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.btn-close-modern {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-close-modern:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.modern-body {
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 8px;
+}
+
+.form-label i {
+    color: #2c5aa0;
+    width: 16px;
+}
+
+.modern-input,
+.modern-textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.modern-textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.modern-input:focus,
+.modern-textarea:focus {
+    border-color: #2c5aa0;
+    box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1);
+}
+
+.row {
+    display: flex;
+    margin: 0 -10px;
+}
+
+.col-md-6 {
+    flex: 1;
+    padding: 0 10px;
+}
+
+.toggle-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.toggle-info {
+    flex: 1;
+}
+
+.toggle-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.toggle-header i {
+    color: #2c5aa0;
+    font-size: 16px;
+}
+
+.toggle-header span {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.toggle-desc {
+    font-size: 12px;
+    color: #718096;
+    margin: 0;
+}
+
+.toggle-switch {
+    position: relative;
+}
+
+.toggle-input {
+    display: none;
+}
+
+.toggle-label {
+    display: block;
+    width: 44px;
+    height: 24px;
+    background: #cbd5e0;
+    border-radius: 12px;
     cursor: pointer;
     transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    text-decoration: none;
     position: relative;
-    overflow: hidden;
 }
 
-.btn-primary-custom {
-    background: linear-gradient(135deg, #46A29F 0%, #003366 100%);
+.toggle-slider {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-input:checked + .toggle-label {
+    background: linear-gradient(135deg, #2c5aa0 0%, #46A29F 100%);
+}
+
+.toggle-input:checked + .toggle-label .toggle-slider {
+    transform: translateX(20px);
+}
+
+.info-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: #f0f8ff;
+    border-radius: 8px;
+    border-left: 4px solid #2c5aa0;
+}
+
+.info-icon {
+    width: 32px;
+    height: 32px;
+    background: #2c5aa0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: white;
-    box-shadow: 0 4px 15px rgba(70, 162, 159, 0.3);
+    font-size: 14px;
 }
 
-.btn-primary-custom:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(70, 162, 159, 0.4);
+.info-content {
+    font-size: 14px;
+    color: #2d3748;
 }
 
-.btn-secondary-custom {
+.modern-footer {
+    padding: 20px 24px;
     background: #f8f9fa;
-    color: #6c757d;
-    border: 2px solid #e9ecef;
+    border: none;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
 }
 
-.btn-secondary-custom:hover {
-    background: #e9ecef;
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-secondary {
+    background: white;
+    color: #6c757d;
+    border: 2px solid #e2e8f0;
+}
+
+.btn-secondary:hover {
+    background: #f8f9fa;
     color: #495057;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #2c5aa0 0%, #46A29F 100%);
+    color: white;
+}
+
+.btn-primary:hover {
     transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(44, 90, 160, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .modal-dialog {
+        margin: 10px;
+        max-width: 95%;
+    }
+    
+    .modern-header {
+        padding: 20px;
+    }
+    
+    .modern-body {
+        padding: 20px;
+    }
+    
+    .modern-footer {
+        padding: 16px 20px;
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .row {
+        flex-direction: column;
+        margin: 0;
+    }
+    
+    .col-md-6 {
+        padding: 0;
+    }
+    
+    .toggle-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
 }
 </style>
 
 <script>
-document.getElementById('form-crear-periodo').onsubmit = function(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(this);
-    
-    fetch('{% url "crear_periodo" %}', {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRFToken': '{{ csrf_token }}'
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('crearPeriodoForm');
+    if (form) {
+        // Establecer año actual por defecto
+        const añoInput = document.getElementById('año');
+        if (añoInput && !añoInput.value) {
+            añoInput.value = new Date().getFullYear();
         }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Período creado exitosamente',
-                text: 'Se han creado las carpetas predefinidas automáticamente',
-                timer: 3000,
-                showConfirmButton: false
-            });
-            cerrarModal();
-            setTimeout(() => location.reload(), 3000);
-        } else {
-            let errorMsg = 'Error al crear el período';
-            if (data.errors) {
-                errorMsg = Object.values(data.errors).flat().join(', ');
+        
+        // Validación de fechas en tiempo real
+        const fechaInicio = document.getElementById('fecha_inicio');
+        const fechaFin = document.getElementById('fecha_fin');
+        
+        function validarFechas() {
+            if (fechaInicio.value && fechaFin.value) {
+                const inicio = new Date(fechaInicio.value);
+                const fin = new Date(fechaFin.value);
+                
+                if (fin <= inicio) {
+                    fechaFin.setCustomValidity('La fecha de fin debe ser posterior a la fecha de inicio');
+                } else {
+                    fechaFin.setCustomValidity('');
+                }
             }
-            Swal.fire('Error', errorMsg, 'error');
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        Swal.fire('Error', 'Error de conexión', 'error');
+        
+        fechaInicio.addEventListener('change', validarFechas);
+        fechaFin.addEventListener('change', validarFechas);
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            
+            // Obtener datos del formulario
+            const nombre = document.getElementById('nombre').value.trim();
+            const periodo = document.getElementById('periodo').value;
+            const año = document.getElementById('año').value;
+            const descripcion = document.getElementById('descripcion').value.trim();
+            const fechaInicioVal = document.getElementById('fecha_inicio').value;
+            const fechaFinVal = document.getElementById('fecha_fin').value;
+            const activo = document.getElementById('activo').checked;
+            
+            // Validaciones
+            if (!nombre || !periodo || !año) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Los campos nombre, período y año son obligatorios'
+                });
+                return;
+            }
+            
+            if (fechaInicioVal && fechaFinVal) {
+                const inicio = new Date(fechaInicioVal);
+                const fin = new Date(fechaFinVal);
+                
+                if (fin <= inicio) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'La fecha de fin debe ser posterior a la fecha de inicio'
+                    });
+                    return;
+                }
+            }
+            
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creando...';
+            submitBtn.disabled = true;
+            
+            // Crear FormData manualmente
+            const formData = new FormData();
+            formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+            formData.append('nombre', nombre);
+            formData.append('periodo', periodo);
+            formData.append('año', año);
+            formData.append('descripcion', descripcion);
+            if (fechaInicioVal) formData.append('fecha_inicio', fechaInicioVal);
+            if (fechaFinVal) formData.append('fecha_fin', fechaFinVal);
+            if (activo) {
+                formData.append('activo', 'on');
+            }
+            
+            fetch('/crear_periodo/', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error de red: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Cerrar modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('crearPeriodoModal'));
+                    if (modal) modal.hide();
+                    
+                    // Mostrar éxito y recargar
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Período creado!',
+                        text: 'El período se ha creado correctamente con sus carpetas predefinidas',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    let errorMsg = 'Error al crear el período';
+                    if (data.errors) {
+                        const errors = [];
+                        for (const field in data.errors) {
+                            if (Array.isArray(data.errors[field])) {
+                                errors.push(...data.errors[field]);
+                            } else {
+                                errors.push(data.errors[field]);
+                            }
+                        }
+                        errorMsg = errors.join(', ');
+                    }
+                    throw new Error(errorMsg);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'No se pudo crear el período. Inténtalo de nuevo.'
+                });
+            })
+            .finally(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            });
+        });
+    }
+    
+    // Limpiar formulario al cerrar modal
+    document.getElementById('crearPeriodoModal').addEventListener('hidden.bs.modal', function () {
+        const form = document.getElementById('crearPeriodoForm');
+        if (form) {
+            form.reset();
+            document.getElementById('activo').checked = true; // Mantener activo por defecto
+            // Restablecer año actual
+            const añoInput = document.getElementById('año');
+            if (añoInput) {
+                añoInput.value = new Date().getFullYear();
+            }
+        }
     });
-};
+});
 </script>

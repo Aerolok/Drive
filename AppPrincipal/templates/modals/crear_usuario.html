@@ -1,99 +1,96 @@
 <div class="modal fade" id="crearUsuarioModal" tabindex="-1" role="dialog" aria-labelledby="crearUsuarioModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content shadow-lg border-0">
-            <div class="modal-header bg-institucional text-white border-0">
-                <h5 class="modal-title d-flex align-items-center" id="crearUsuarioModalLabel">
-                    <div class="icon-circle bg-white bg-opacity-20 me-3">
-                        <i class="fas fa-user-plus text-white"></i>
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content modern-modal">
+            <div class="modal-header modern-header">
+                <div class="header-content">
+                    <div class="header-icon">
+                        <i class="fas fa-user-plus"></i>
                     </div>
-                    Crear Nuevo Usuario
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="header-text">
+                        <h4 class="modal-title">Crear Nuevo Usuario</h4>
+                        <p class="modal-subtitle">Agrega un nuevo usuario al sistema</p>
+                    </div>
+                </div>
             </div>
+            
             <form id="crearUsuarioForm" method="post">
-                <div class="modal-body p-4">
+                <div class="modal-body modern-body">
                     {% csrf_token %}
                     
-                    <div class="input-group-custom mb-4">
-                        <div class="input-wrapper">
-                            <input type="text" 
-                                   class="form-control-custom" 
-                                   id="{{ form.username.id_for_label }}" 
-                                   name="{{ form.username.name }}" 
-                                   placeholder=" "
-                                   required>
-                            <label for="{{ form.username.id_for_label }}" class="label-custom">
-                                <i class="fas fa-user me-2"></i>Nombre de Usuario
-                            </label>
-                            <div class="input-border"></div>
-                        </div>
+                    <div class="form-group">
+                        <label for="username" class="form-label">
+                            <i class="fas fa-user"></i>
+                            Nombre de usuario
+                        </label>
+                        <input type="text" 
+                               class="form-control modern-input" 
+                               id="username" 
+                               name="username" 
+                               placeholder="Ingresa el nombre de usuario"
+                               required>
                     </div>
 
-                    <div class="input-group-custom mb-4">
-                        <div class="input-wrapper">
-                            <input type="email" 
-                                   class="form-control-custom" 
-                                   id="{{ form.email.id_for_label }}" 
-                                   name="{{ form.email.name }}" 
-                                   placeholder=" "
-                                   required>
-                            <label for="{{ form.email.id_for_label }}" class="label-custom">
-                                <i class="fas fa-envelope me-2"></i>Correo Electrónico
-                            </label>
-                            <div class="input-border"></div>
-                        </div>
+                    <div class="form-group">
+                        <label for="email" class="form-label">
+                            <i class="fas fa-envelope"></i>
+                            Correo electrónico
+                        </label>
+                        <input type="email" 
+                               class="form-control modern-input" 
+                               id="email" 
+                               name="email" 
+                               placeholder="usuario@ejemplo.com"
+                               required>
                     </div>
 
-                    <div class="input-group-custom mb-4">
-                        <div class="input-wrapper">
-                            <input type="password" 
-                                   class="form-control-custom" 
-                                   id="{{ form.password.id_for_label }}" 
-                                   name="{{ form.password.name }}" 
-                                   placeholder=" "
-                                   required>
-                            <label for="{{ form.password.id_for_label }}" class="label-custom">
-                                <i class="fas fa-lock me-2"></i>Contraseña
-                            </label>
-                            <div class="input-border"></div>
-                        </div>
+                    <div class="form-group">
+                        <label for="password" class="form-label">
+                            <i class="fas fa-lock"></i>
+                            Contraseña
+                        </label>
+                        <input type="password" 
+                               class="form-control modern-input" 
+                               id="password" 
+                               name="password" 
+                               placeholder="Ingresa una contraseña segura"
+                               required>
                     </div>
 
-                    <div class="checkbox-custom mb-4">
-                        <div class="checkbox-wrapper">
-                            <input class="checkbox-input" 
-                                   type="checkbox" 
-                                   id="{{ form.is_staff.id_for_label }}" 
-                                   name="{{ form.is_staff.name }}">
-                            <label class="checkbox-label" for="{{ form.is_staff.id_for_label }}">
-                                <span class="checkbox-custom-box">
-                                    <i class="fas fa-check"></i>
-                                </span>
-                                <div class="checkbox-text">
-                                    <span class="checkbox-title">
-                                        <i class="fas fa-user-shield me-2"></i>Administrador
-                                    </span>
-                                    <span class="checkbox-description">
-                                        Si está marcado, el usuario tendrá permisos de administrador
-                                    </span>
+                    <div class="form-group">
+                        <div class="toggle-container">
+                            <div class="toggle-info">
+                                <div class="toggle-header">
+                                    <i class="fas fa-user-shield"></i>
+                                    <span>Permisos de administrador</span>
                                 </div>
-                            </label>
+                                <p class="toggle-desc">Otorga permisos administrativos al usuario</p>
+                            </div>
+                            <div class="toggle-switch">
+                                <input type="checkbox" 
+                                       id="is_admin" 
+                                       name="is_admin"
+                                       class="toggle-input">
+                                <label for="is_admin" class="toggle-label">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="alert-custom">
-                        <div class="alert-icon">
+                    <div class="info-card">
+                        <div class="info-icon">
                             <i class="fas fa-info-circle"></i>
                         </div>
-                        <div class="alert-content">
+                        <div class="info-content">
                             <strong>Información:</strong> El usuario recibirá un correo con sus credenciales de acceso.
                         </div>
                     </div>
                 </div>
                 
-                <div class="modal-footer border-0 bg-light p-4 justify-content-end">
-                    <button type="submit" class="btn-custom btn-primary-custom">
-                        <i class="fas fa-user-plus me-2"></i>Crear Usuario
+                <div class="modal-footer modern-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i>
+                        Crear Usuario
                     </button>
                 </div>
             </form>
@@ -102,241 +99,372 @@
 </div>
 
 <style>
-/* Colores institucionales */
-.bg-institucional {
-    background: linear-gradient(135deg, #003366 0%, #02385F 100%);
+.modern-modal {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    max-width: 500px;
 }
 
-.icon-circle {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+.modern-header {
+    background: linear-gradient(135deg, #2c5aa0 0%, #46A29F 100%);
+    color: white;
+    padding: 24px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.header-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 20px;
 }
 
-/* Inputs personalizados */
-.input-group-custom {
-    position: relative;
+.header-text .modal-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
 }
 
-.input-wrapper {
-    position: relative;
+.modal-subtitle {
+    margin: 4px 0 0 0;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.btn-close-modern {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-close-modern:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.modern-body {
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #2d3748;
     margin-bottom: 8px;
 }
 
-.form-control-custom {
+.form-label i {
+    color: #2c5aa0;
+    width: 16px;
+}
+
+.modern-input {
     width: 100%;
-    padding: 16px 12px 8px 12px;
-    border: 2px solid #e9ecef;
-    border-radius: 12px;
-    font-size: 16px;
-    background: #ffffff;
-    transition: all 0.3s ease;
+    padding: 10px 14px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s ease;
     outline: none;
-    font-family: inherit;
 }
 
-.form-control-custom:focus {
-    border-color: #46A29F;
-    box-shadow: 0 0 0 3px rgba(70, 162, 159, 0.1);
+.modern-input:focus {
+    border-color: #2c5aa0;
+    box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1);
 }
 
-.label-custom {
-    position: absolute;
-    left: 12px;
-    top: 16px;
-    color: #6c757d;
-    font-size: 16px;
-    transition: all 0.3s ease;
-    pointer-events: none;
-    background: white;
-    padding: 0 4px;
-}
-
-.form-control-custom:focus ~ .label-custom,
-.form-control-custom:not(:placeholder-shown) ~ .label-custom {
-    top: -8px;
-    font-size: 12px;
-    color: #46A29F;
-    font-weight: 600;
-}
-
-.input-border {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: linear-gradient(90deg, #46A29F, #003366);
-    transition: width 0.3s ease;
-}
-
-.form-control-custom:focus ~ .input-border {
-    width: 100%;
-}
-
-/* Checkbox personalizado */
-.checkbox-custom {
-    margin: 20px 0;
-}
-
-.checkbox-wrapper {
-    position: relative;
-}
-
-.checkbox-input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-}
-
-.checkbox-label {
-    display: flex;
-    align-items: flex-start;
-    cursor: pointer;
-    padding: 16px;
-    border: 2px solid #e9ecef;
-    border-radius: 12px;
-    background: #ffffff;
-    transition: all 0.3s ease;
-}
-
-.checkbox-label:hover {
-    border-color: #46A29F;
-    background: #f8fffe;
-}
-
-.checkbox-input:checked + .checkbox-label {
-    border-color: #46A29F;
-    background: linear-gradient(135deg, #f8fffe 0%, #f0fffe 100%);
-}
-
-.checkbox-custom-box {
-    width: 24px;
-    height: 24px;
-    border: 2px solid #dee2e6;
-    border-radius: 6px;
-    margin-right: 12px;
+.toggle-container {
     display: flex;
     align-items: center;
-    justify-content: center;
-    background: white;
-    transition: all 0.3s ease;
-    flex-shrink: 0;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
 }
 
-.checkbox-input:checked + .checkbox-label .checkbox-custom-box {
-    background: #46A29F;
-    border-color: #46A29F;
-    color: white;
-}
-
-.checkbox-custom-box i {
-    font-size: 12px;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.checkbox-input:checked + .checkbox-label .checkbox-custom-box i {
-    opacity: 1;
-}
-
-.checkbox-text {
+.toggle-info {
     flex: 1;
 }
 
-.checkbox-title {
-    display: block;
-    font-weight: 600;
-    color: #003366;
+.toggle-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     margin-bottom: 4px;
 }
 
-.checkbox-description {
-    display: block;
-    font-size: 14px;
-    color: #6c757d;
-    line-height: 1.4;
+.toggle-header i {
+    color: #2c5aa0;
+    font-size: 16px;
 }
 
-/* Alerta personalizada */
-.alert-custom {
+.toggle-header span {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.toggle-desc {
+    font-size: 12px;
+    color: #718096;
+    margin: 0;
+}
+
+.toggle-switch {
+    position: relative;
+}
+
+.toggle-input {
+    display: none;
+}
+
+.toggle-label {
+    display: block;
+    width: 44px;
+    height: 24px;
+    background: #cbd5e0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.toggle-slider {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-input:checked + .toggle-label {
+    background: linear-gradient(135deg, #2c5aa0 0%, #46A29F 100%);
+}
+
+.toggle-input:checked + .toggle-label .toggle-slider {
+    transform: translateX(20px);
+}
+
+.info-card {
     display: flex;
     align-items: center;
-    padding: 16px;
-    background: linear-gradient(135deg, #e8f4fd 0%, #f0f8ff 100%);
-    border: 1px solid #46A29F;
-    border-radius: 12px;
-    margin-top: 20px;
+    gap: 10px;
+    padding: 12px;
+    background: #f0f8ff;
+    border-radius: 8px;
+    border-left: 3px solid #2c5aa0;
 }
 
-.alert-icon {
-    width: 40px;
-    height: 40px;
-    background: #46A29F;
-    border-radius: 50%;
+.info-icon {
+    width: 28px;
+    height: 28px;
+    background: #2c5aa0;
+    border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    margin-right: 12px;
-    flex-shrink: 0;
+    font-size: 12px;
 }
 
-.alert-content {
-    color: #003366;
-    font-size: 14px;
-    line-height: 1.5;
+.info-content {
+    font-size: 13px;
+    color: #2d3748;
 }
 
-.alert-content strong {
-    color: #46A29F;
-}
-
-/* Botones personalizados */
-.btn-custom {
-    padding: 12px 24px;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 14px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    text-decoration: none;
-    position: relative;
-    overflow: hidden;
-}
-
-.btn-primary-custom {
-    background: linear-gradient(135deg, #46A29F 0%, #003366 100%);
-    color: white;
-    box-shadow: 0 4px 15px rgba(70, 162, 159, 0.3);
-}
-
-.btn-primary-custom:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(70, 162, 159, 0.4);
-}
-
-.btn-secondary-custom {
+.modern-footer {
+    padding: 20px 24px;
     background: #f8f9fa;
+    border: none;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-secondary {
+    background: white;
     color: #6c757d;
-    border: 2px solid #e9ecef;
+    border: 2px solid #e2e8f0;
 }
 
-.btn-secondary-custom:hover {
-    background: #e9ecef;
+.btn-secondary:hover {
+    background: #f8f9fa;
     color: #495057;
-    transform: translateY(-1px);
 }
 
-.modal-content {
-    border-radius: 15px;
-    overflow: hidden;
+.btn-primary {
+    background: linear-gradient(135deg, #2c5aa0 0%, #46A29F 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(44, 90, 160, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .modal-dialog {
+        margin: 10px;
+        max-width: 95%;
+    }
+    
+    .modern-header {
+        padding: 20px;
+    }
+    
+    .modern-body {
+        padding: 20px;
+    }
+    
+    .modern-footer {
+        padding: 16px 20px;
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .toggle-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
 }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('crearUsuarioForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            
+            // Validaciones
+            const username = formData.get('username').trim();
+            const email = formData.get('email').trim();
+            const password = formData.get('password').trim();
+            
+            if (!username || !email || !password) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Todos los campos son obligatorios'
+                });
+                return;
+            }
+            
+            if (password.length < 6) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'La contraseña debe tener al menos 6 caracteres'
+                });
+                return;
+            }
+            
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creando...';
+            submitBtn.disabled = true;
+            
+            fetch('/crear_usuario/', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Cerrar modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('crearUsuarioModal'));
+                    if (modal) modal.hide();
+                    
+                    // Mostrar éxito y recargar
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Usuario creado!',
+                        text: 'El usuario se ha creado correctamente',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    let errorMsg = 'Error al crear el usuario';
+                    if (data.errors) {
+                        errorMsg = Object.values(data.errors).flat().join(', ');
+                    }
+                    throw new Error(errorMsg);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'No se pudo crear el usuario. Inténtalo de nuevo.'
+                });
+            })
+            .finally(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            });
+        });
+    }
+});
+</script>
   
