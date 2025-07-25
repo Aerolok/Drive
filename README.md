@@ -30,8 +30,8 @@ Un sistema web desarrollado en Django para la gestión y organización de archiv
 ### 1. Clonar el Repositorio
 
 ```bash
-git clone https://github.com/tu-usuario/drive-academico.git
-cd drive-academico
+git clone https://github.com/Aerolok/Drive.git
+cd Drive
 ```
 
 ### 2. Crear Entorno Virtual
