@@ -1,13 +1,32 @@
+# Python
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Django
 db.sqlite3
 *.log
 *.swp
 .DS_Store
+local_settings.py
 
-# Media files (uploads)
-media/
-uploads/
+# Media files (uploads) - excluir archivos pero mantener estructura
+media/*
+!media/.gitkeep
+!media/archivos/
+media/archivos/*
+!media/archivos/.gitkeep
+
+# Static files (collected)
+staticfiles/
+static_collected/
 
 # Large files
 *.tm
@@ -19,6 +38,29 @@ uploads/
 *.rar
 *.7z
 
-# Files larger than 100MB
-*.iso
-*.dmg
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Backup files
+*.bak
+*.backup
+
+# Temporary files
+*.tmp
+*.temp
+
+# Vercel
+.vercel/
+

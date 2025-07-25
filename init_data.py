@@ -8,10 +8,11 @@ import django
 from datetime import datetime, date
 
 # Configurar Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Drive.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'miapp.settings')
 django.setup()
 
-from AppPrincipal.models import PeriodoAcademico, Carpeta, Usuario
+from AppPrincipal.models import PeriodoAcademico, Carpeta
+from django.contrib.auth.models import User
 
 def crear_periodos_ejemplo():
     """Crear períodos académicos de ejemplo"""
@@ -88,10 +89,10 @@ def crear_carpetas_predefinidas(periodo):
             carpeta_padre=None,
             defaults={
                 'descripcion': descripcion,
-                'tipo_carpeta': 'predefinida',
+                'tipo_carpeta': 'personalizada',
                 'orden': orden,
                 'publica': False,
-                'propietario': Usuario.objects.filter(is_staff=True).first()
+                'usuario': User.objects.filter(is_staff=True).first()
             }
         )
         if created:
@@ -117,10 +118,10 @@ def crear_subcarpetas_ejemplo(carpeta_padre):
             periodo_academico=carpeta_padre.periodo_academico,
             defaults={
                 'descripcion': f'Subcarpeta para {nombre}',
-                'tipo_carpeta': 'subcarpeta',
+                'tipo_carpeta': 'personalizada',
                 'orden': i,
                 'publica': False,
-                'propietario': carpeta_padre.propietario
+                'usuario': carpeta_padre.usuario
             }
         )
         if created:
